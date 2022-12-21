@@ -10,8 +10,10 @@ const getTokenFrom = (request: Request) => {
 	}
 	return null
 }
-
-const userAuthentication = (req: Request, res: Response, next: any) => {
+export interface RequestAuthType extends Request {
+	auth?: { userId?: any }
+}
+const userAuthentication = (req: RequestAuthType, res: Response, next: any) => {
 	const token = getTokenFrom(req)
 	console.log(token)
 	const decodedToken = jwt.verify(token!, process.env.SECRET!) as UserType

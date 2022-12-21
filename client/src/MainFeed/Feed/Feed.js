@@ -15,13 +15,12 @@ function Feed(props) {
   console.log("props", props);
   const [userPost, setUserPost] = useState([])
   const [like, setLike] = useState(0)
-  const [postId, setPostId] = useState([])
   const [comment,setComment] =useState('')
+  const [commentValue,setCommentValue]=useState('')
+  const [currentUser,setCurrentUser]=useState([])
 
   const handleClick = (e) => {
-
-    setPostId(e)
-    console.log(postId);
+   
     switch (e.detail) {
       case 1:
         console.log("click")
@@ -41,21 +40,28 @@ function Feed(props) {
       console.log(res)
       setUserPost(res.data)
     })
-  }, [like])
+    UserProfile.userGet(auth).then((res)=>{
+     console.log('userGet',res) 
+     let data =res.data;
+     let profilePicture=data.profilePicture;
+     let setProfile=profilePicture[0]
 
+     setCurrentUser(setProfile)
+    })
+  }, [like])
+  console.log('current',currentUser)
   let userId = localStorage.getItem("userid")
   const handleLikeClicks = (e) => {
-    setPostId(e)
-    
+
     let like = userPost.find(curr => curr.id === e)
     if (like.likedBy?.includes(userId)) {
-      AddPosts.removeLike(auth, postId).then((res) => {
+      AddPosts.removeLike(auth, e).then((res) => {
         console.log(res);
         setLike(Math.random()*5);
       })
     }
     else {
-      AddPosts.addLike(auth, postId).then((res) => {
+      AddPosts.addLike(auth, e).then((res) => {
         console.log('auth', res);
         setLike(Math.random()*5)
       })
@@ -64,6 +70,7 @@ function Feed(props) {
   
    const getCommentValues=(e)=>{
     console.log(e.target.value);
+    setCommentValue(e.target.value)
     setComment(e.target.value)
    }
    const share=(postId)=>{
@@ -73,9 +80,11 @@ function Feed(props) {
     }
      AddPost.addComment(auth,postId,data).then((res)=>{
       console.log(res);
+      setLike(Math.random()*5);
+      setCommentValue('')
      })
    }
- 
+   
   // console.log('userPost', userPost)
  console.log('userPost',userPost);
 
@@ -103,8 +112,10 @@ function Feed(props) {
               user={current.userId.id}
               share={()=>share(current.id)}
               getCommentValues={getCommentValues}
-              showComments={console.log('new lafda',current?.comment) || current?.comment}
-            //  postProfile={console.log( current.userId?.profilePicture[0]) || current.userId?.profilePicture}
+              showComments={current?.comment}
+             postProfile={console.log( current.userId?.profilePicture[0]) || current.userId?.profilePicture[0]}
+             setCommentValue={console.log('commentvalue in fee',commentValue) || commentValue}
+             currentUserProfileImage={currentUser}
             />
           )
         })

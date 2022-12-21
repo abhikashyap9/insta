@@ -1,5 +1,5 @@
 import axios from "axios";
-const baseUrl='http://localhost:3002'
+const baseUrl='http://localhost:3001'
 
 
 

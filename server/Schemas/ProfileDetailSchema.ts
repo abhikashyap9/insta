@@ -75,10 +75,10 @@ const ProfileDetails = new mongoose.Schema({
 // })
 
 ProfileDetails.set('toJSON', {
-	transform: (document, returnedObject) => {
+	transform: (document:any, returnedObject:any) => {
 		returnedObject.id = returnedObject._id.toString()
 		delete returnedObject._id
-		delete returnedObject._v
+		delete returnedObject._vs
 	},
 })
 

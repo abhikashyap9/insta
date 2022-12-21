@@ -10,11 +10,13 @@ import { UserType } from '../types/userType'
 const profilerouter = express.Router({
 	strict: true,
 })
-
-profilerouter.post('/userdetails', userAuthentication, async (req: Request, res: Response) => {
+export interface RequestAuthType extends Request {
+	auth?: { userId?: string }
+}
+profilerouter.post('/userdetails', userAuthentication, async (req: RequestAuthType, res: Response) => {
 	const { bio, website, phoneNumber, gender, birthday } = req.body
 
-	let id = req['auth'].userId
+	let id = req['auth']?.userId
 	console.log(bio, website, phoneNumber, gender, birthday)
 	const profiledetails = new ProfileDetails({
 		bio: bio,
@@ -37,7 +39,6 @@ profilerouter.post('/userdetails', userAuthentication, async (req: Request, res:
 profilerouter.get('/otherprofiles', async (req, res) => {
 	let users = await Profile.find()
 		.populate('user')
-		// .populate('posts')
 		.populate('userDetails')
 	console.log(users)
 	try {
@@ -70,7 +71,6 @@ profilerouter.put('/profileimage', upload.single('image'), async (req, res) => {
 	const token = getTokenFrom(req)
 
 	const decodedToken = jwt.verify(token!, process.env.SECRET!) as UserType
-	console.log('decoded', decodedToken)
 	if (!decodedToken.id) {
 		return res.status(401).json({ error: 'token missing or invalid token' })
 	}
@@ -81,6 +81,8 @@ profilerouter.put('/profileimage', upload.single('image'), async (req, res) => {
 	const userId = decodedToken.id
 
 	try {
+		let deleteProfilePicture = await Signupuser.findByIdAndUpdate(userId, { $set: { profilePicture:[] } } )
+		console.log('deletd',deleteProfilePicture)
 		let profileUpdate = await Signupuser.findByIdAndUpdate(
 			userId,
 			{ $push: { profilePicture: req['file']?.path } },

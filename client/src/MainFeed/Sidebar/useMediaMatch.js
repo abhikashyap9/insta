@@ -6,7 +6,6 @@ export const useMatchMedia = (mediaQuery, initialValue) => {
 
   useEffect(() => {
     const watcher = window.matchMedia(mediaQuery);
-    console.log('watcher',watcher)
     setIsMatching(watcher.matches);
     const listener = (matches) => {
       setIsMatching(matches.matches);

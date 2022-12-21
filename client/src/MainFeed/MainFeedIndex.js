@@ -36,7 +36,11 @@ function MainFeedIndex() {
     <>
       <Navbar
         instaLogo={<InstagramIcon style={{ fontSize: 24 }} />}
-        searchBar={<div className='sm:py-1 md:py-1 lg:py-0 rounded-md border border-gray-200 bg-gray-100'><input type="text" placeholder='Search' className='outline-none border-none w-full bg-transparent text-sm pl-2' /></div>}
+        searchBar={<div className='sm:py-1 md:py-1 lg:py-0 rounded-md border border-gray-200 bg-gray-100'>
+        <input type="text" 
+        placeholder='Search' 
+        className='outline-none border-none w-full bg-transparent text-sm pl-2' />
+        </div>}
         profile='profile'
         setProfile={`profile`}
         profileImage={profileImage}

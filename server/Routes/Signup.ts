@@ -7,7 +7,7 @@ import bcrypt from 'bcrypt'
 import Signupuser from '../Schemas/Signupschema'
 import Profile from '../Schemas/Profile'
 import userAuthentication from '../middeware/jwtauthorization'
-import { UserType } from '../types/userType'
+import { ReqAuthType, UserType } from '../types/userType'
 
 signrouter.post('/signup', async (req: Request, res: Response) => {
 	const { email, fullName, userName, password } = req.body
@@ -36,11 +36,6 @@ signrouter.post('/signup', async (req: Request, res: Response) => {
 		userName: userName,
 		password: hashedPassword,
 	})
-	// let profile =new Profile({
-	//     email: email,
-	//     fullName: fullName,
-	//     userName: userName,
-	// })
 
 	try {
 		let savedUser = await signupuser.save()
@@ -115,7 +110,7 @@ signrouter.get('/otherprofile/:id', async (req: Request, res: Response, next) =>
 	next()
 })
 
-signrouter.put('/follow/:id', userAuthentication, async (req: Request, res: Response) => {
+signrouter.put('/follow/:id', userAuthentication, async (req: RequestAuthType, res: Response) => {
 	const { id } = req.params
 	let followingId = req['auth']?.userId
 	// console.log('request',req)
@@ -123,27 +118,28 @@ signrouter.put('/follow/:id', userAuthentication, async (req: Request, res: Resp
 	try {
 		let follower = await Signupuser.findByIdAndUpdate(followingId, { $push: { following: id } }, { new: true })
 		let following = await Signupuser.findByIdAndUpdate(id, { $push: { followers: followingId } }, { new: true })
-		//    let following
-
 		res.status(201).json(follower).end()
-		console.log('follower', follower)
-		console.log('following', following)
+
 	} catch (err) {
 		console.log(err)
 		res.status(400).json({ error: err })
 	}
 })
-
-signrouter.put('/unfollow/:id', userAuthentication, async (req: Request, res: Response) => {
+export interface RequestAuthType extends Request {
+	auth?: { userId?: string }
+}
+//   declare module "express" { 
+// 	export interface Request {
+// 	  auth: any
+// 	}
+//   }
+signrouter.put('/unfollow/:id', userAuthentication, async (req: RequestAuthType, res: Response) => {
 	const { id } = req.params
 	let followingId = req['auth']?.userId
-
-	// console.log('request',req)
 
 	try {
 		let follower = await Signupuser.findByIdAndUpdate(followingId, { $pull: { following: id } }, { new: true })
 		let following = await Signupuser.findByIdAndUpdate(id, { $pull: { followers: followingId } }, { new: true })
-		//    let following
 
 		res.status(201).json(follower).end()
 		console.log('follower', follower)

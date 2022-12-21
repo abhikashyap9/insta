@@ -4,6 +4,12 @@ const config = {
 	testEnvironment: 'node',
 	preset: 'ts-jest',
 	testPathIgnorePatterns: ['/node_modules/', '/utils'],
+
+	compilerOptions: {
+		// ... rest
+		"typeRoots": ["./node_modules/@types", "./typings"]
+	}
+
 }
 
-module.exports = config
+export default config

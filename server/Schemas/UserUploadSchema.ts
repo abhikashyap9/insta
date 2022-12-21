@@ -34,7 +34,7 @@ const UserUploads = new mongoose.Schema({
 })
 // [899811,[comment]]
 UserUploads.set('toJSON', {
-	transform: (document, returnedObject) => {
+	transform: (document:any, returnedObject:any) => {
 		returnedObject.id = returnedObject._id.toString()
 		delete returnedObject._id
 		delete returnedObject._v

@@ -19,7 +19,7 @@ const fileStorageEngine = multer.diskStorage({
 })
 const upload = multer({ storage: fileStorageEngine })
 
-const getTokenFrom = (request) => {
+const getTokenFrom = (request: Request) => {
 	const authorization = request.get('authorization')
 
 	if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
@@ -32,6 +32,7 @@ useruploadsrouter.post('/single', upload.single('image'), async (req, res) => {
 	const { caption, location } = req.body
 
 	const token = getTokenFrom(req)
+	console.log(token)
 
 	const decodedToken = jwt.verify(token!, process.env.SECRET!) as UserType
 	console.log('decoded', decodedToken)
@@ -58,9 +59,11 @@ useruploadsrouter.post('/single', upload.single('image'), async (req, res) => {
 		res.status(400).json({ err })
 	}
 })
-
+export interface RequestAuthType extends Request {
+	auth?: { userId?: string }
+}
 useruploadsrouter.get('/userpost', async (req, res) => {
-	let uploads = await UserUploads.find().populate('userId', 'userName profilePicture')
+	let uploads = await UserUploads.find().populate('userId', 'userName profilePicture').populate("comment.postedBy")
 	console.log(uploads)
 	//    .populate('commentedBy')
 	//    .exec()
@@ -84,7 +87,7 @@ useruploadsrouter.get('/userpost', async (req, res) => {
 	}
 })
 
-useruploadsrouter.put('/likedby/:id', userAuthentication, async (req, res) => {
+useruploadsrouter.put('/likedby/:id', userAuthentication, async (req: RequestAuthType, res) => {
 	const { id } = req.params
 	console.log(id)
 	let userId = req['auth']?.userId
@@ -97,7 +100,7 @@ useruploadsrouter.put('/likedby/:id', userAuthentication, async (req, res) => {
 	}
 })
 
-useruploadsrouter.put('/unlikedby/:id', userAuthentication, async (req, res) => {
+useruploadsrouter.put('/unlikedby/:id', userAuthentication, async (req: RequestAuthType, res) => {
 	const { id } = req.params
 	console.log(id)
 	let userId = req['auth']?.userId
@@ -110,7 +113,7 @@ useruploadsrouter.put('/unlikedby/:id', userAuthentication, async (req, res) => 
 	}
 })
 
-useruploadsrouter.put('/addcomment/:id', userAuthentication, async (req, res) => {
+useruploadsrouter.put('/addcomment/:id', userAuthentication, async (req: RequestAuthType, res) => {
 	const { id } = req.params
 	console.log(id)
 	let userId = req['auth']?.userId

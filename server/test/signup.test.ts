@@ -34,12 +34,12 @@ describe('Test the root path', () => {
 	test('Create New User', async () => {
 		const response = await request(app).post('/signup').send(userData)
 		expect(response.statusCode).toBe(201)
-		expect(response._body).toMatchObject(userDataWithoutPassword)
+		expect(response.body).toMatchObject(userDataWithoutPassword)
 	})
 	test('should not signin with exiting email', async () => {
 		const response = await request(app).post('/signup').send(userData)
 		expect(response.statusCode).toBe(409)
-		expect(response._body).toMatchObject({error: 'User Email Already Exist'})
+		expect(response.body).toMatchObject({error: 'User Email Already Exist'})
 	})
 
 	test('should not signup with exiting username', async () => {
@@ -47,8 +47,8 @@ describe('Test the root path', () => {
 			.post('/signup')
 			.send({...userData, email: 'any_new_email@gmail.com'})
 		expect(response.statusCode).toBe(409)
-		console.log('resonse', response._body)
-		expect(response._body).toMatchObject({error: 'User Name Already Exist'})
+		console.log('resonse', response.body)
+		expect(response.body).toMatchObject({error: 'User Name Already Exist'})
 	})
 
 	// test('should not signin with exiting username', async () => {
@@ -59,8 +59,8 @@ describe('Test the root path', () => {
 
 	test('Login Api', async () => {
 		const response = await request(app).post('/login').send(userDataLogin)
-		expect(typeof response._body.token).toBe('string')
-		expect(response._body.username).toBe(userData.fullName)
+		expect(typeof response.body.token).toBe('string')
+		expect(response.body.username).toBe(userData.fullName)
 		expect(response.statusCode).toBe(200)
 	})
 
@@ -68,7 +68,7 @@ describe('Test the root path', () => {
 		const response = await request(app)
 			.post('/login')
 			.send({...userData, password: 'BAD_PASSWORD'})
-		expect(response._body.error).toBe('Invalid Password')
+		expect(response.body.error).toBe('Invalid Password')
 	})
 
 	// todo

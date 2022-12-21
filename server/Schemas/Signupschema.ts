@@ -36,10 +36,10 @@ const Signupuser = new mongoose.Schema({
 			// select:false
 		},
 	],
-	profilePicture: {
+	profilePicture: [{
 		type: String,
 		ref: 'signupuser',
-	},
+	}],
 })
 // const UserUploads=new mongoose.Schema({
 //     userId:{
@@ -130,7 +130,7 @@ Profile.set('toJSON', {
 
 Signupuser.set('toJSON', {
 	transform: (document, returnedObject) => {
-		returnedObject.id = returnedObject._id.toString()
+		returnedObject.id = returnedObject?._id?.toString()
 		delete returnedObject._id
 		delete returnedObject.__v
 

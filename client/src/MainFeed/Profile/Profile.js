@@ -17,7 +17,7 @@ function Profile() {
   const [profileImage, setProfileImage] = useState([]);
   const [followers,setFollowers] =useState([])
   const [followings,setFollowings] = useState([])
-
+  const [update,setUpdate]=useState([])
 
   const closeBox = () => { setIsOpen(false) }
 
@@ -40,33 +40,35 @@ function Profile() {
       const formData = new FormData()
       formData.append("image", imageFile)
       AddPosts.addProfileImage(formData, auth).then((res) => {
-        setProfileImage(res.data)
+        if(res.status===201){
+          console.log('OnSuceesss',res)
+          setUpdate(Math.random()*5)
+
+        }
+        else{
+          console.log('OnFail',res)
+        }
       })
     }
   }
   useEffect(() => {
 
     UserProfile.userGet(auth).then((res) => {
+      console.log(res)
       const data=res.data
       const{ following, followers }=data
       const profilePicture=data.profilePicture;
       const setProfile=profilePicture[0];
+      console.log(setProfile)
       let followingLength=following.length;
       let followerLength=followers.length;
-
       setFollowers(followerLength)
       setFollowings(followingLength)  
       setUser(data)
       setProfileImage(setProfile)
     })
 
-    // UserProfile.userImage(auth).then((res) => {
-    //   // setProfileImage(res.data)
-    //   console.log(res.data)
-    // })
-
-  }, [])
-  console.log('picture',profileImage)
+  }, [update])
   
 
   return (
