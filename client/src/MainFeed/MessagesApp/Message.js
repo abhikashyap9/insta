@@ -1,10 +1,21 @@
-import React from 'react'
+import React,{useEffect, useState} from 'react'
 import tw from 'tailwind-styled-components'
 import CallIcon from '@mui/icons-material/Call';
 import VideoCallIcon from '@mui/icons-material/VideoCall';
 import InfoIcon from '@mui/icons-material/Info';
 import PhotoLibraryIcon from '@mui/icons-material/PhotoLibrary';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import SendIcon from '@mui/icons-material/Send';
+import '../../App.css'
+import io from 'socket.io-client';
+import { useParams } from 'react-router-dom';
+import UserProfile from '../../services/userProfile.service';
+
+const socket=io.connect('http://localhost:3001');
+console.log(socket)
+
+
+// import {animate__slideOutRight} from 'react-animations/lib/animate__slideOutRight'
 
 const LeftItems = tw.div` border-r-indigo-200 border-gray-800 basis-1/2 border-r`
 const Header = tw.div`border-b py-3 text-center`
@@ -16,6 +27,75 @@ const MessagesName=tw.div``
 const RightItems=tw.div`basis-1/2`
 
 function Message() {
+  const [send,setSend]=useState(false);
+  const [isConnected, setIsConnected] = useState(socket.connected);
+  const [lastPong,setLastPong]=useState(null);
+  const [message,setMessage]=useState('');
+  const [user,setUser]=useState({profilePic:'',name:''})
+
+  const {id} = useParams();
+  console.log(id)
+
+  useEffect(() => {
+    UserProfile.getUserById(id).then((res)=>{
+      setUser(res.data)
+      let data = res.data
+      const {profilePicture,userName}=data  
+      const profileImage=profilePicture[0]    
+      setUser({...user,profilePic:profileImage,name:userName})
+    })
+  }, [])
+  console.log(user)
+
+  useEffect(()=>{
+    socket.on('connect',()=>{
+      setIsConnected(true)
+    })
+
+    socket.on('disconnect',()=>{
+      setIsConnected(false)
+    })
+
+    socket.on('pong',()=>{
+      setLastPong(new Date().toISOString());
+    })
+    return ()=>{
+      socket.off('connect')
+      socket.off('disconnect')
+      socket.off('pong')
+    }
+  },[])
+
+  console.log(isConnected)
+  console.log(lastPong)
+
+  const getMessagesValues=(e)=>{
+  console.log(e.target.value)
+  let messageValue=e.target.value;
+  setMessage(messageValue)
+   if(messageValue.length>0){
+    setSend(true)
+    
+   }
+   else{
+    setSend(false)
+  }}
+
+  const  sendPing= async()=>{
+    console.log(message);
+    const messageData={
+      room:room,
+      message:message,
+      time: new Date(Date.now()).getHours() +
+      ":" +
+      new Date(Date.now()).getMinutes(),
+    }
+   await socket.emit('ping',messageData);
+   setMessage('')
+  }
+
+
+
 
   return (
     <div>
@@ -23,7 +103,7 @@ function Message() {
 
         <LeftItems>
 
-          <Header><p>Abhishek</p></Header>
+          <Header><p>{user.userName}</p></Header>
           <MessageInfo1>
             <ImageContainer className=''>
               <img
@@ -32,7 +112,7 @@ function Message() {
                 alt='image' />
             </ImageContainer>
             <div className='text-xs'>
-              <p className='text-sm'>Abhishek</p>
+              <p className='text-sm'>{user.userName}</p>
               <p className='text-xs text-gray-400'>Sent you a message</p>
             </div>
           </MessageInfo1>
@@ -45,11 +125,11 @@ function Message() {
             <ImageContainer className=''>
               <img
                 className="inline-block h-8 w-8 rounded-full ring-2 ring-white"
-                src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbrvOZf5zaHg_9a8upGltfVtObFu_0QH1rcw&usqp=CAU'
+                src={`http://localhost:3001/${user.profilePic}`}
                 alt='image' />
             </ImageContainer>
             <div className='text-xs'>
-              <p className='text-sm'>Abhishek</p>
+              <p className='text-sm'>{user.name}</p>
               <p className='text-xs text-gray-400'>Sent you a message</p>
             </div>
 
@@ -65,10 +145,33 @@ function Message() {
 
           <div className='m-1.5'>
             <div className='border px-2 rounded-xl w-1/2 p-2 break-all '><p>Message Sent</p></div>
-            <div className='border px-2 rounded-xl ml-auto w-1/2 bg-gray-100 p-2 break-all'><p>Recivbbbbbbbbbbbbbbbbbbbbbbbbbbbed Message</p></div>
+            <div className='border px-2 rounded-xl ml-auto w-1/2 bg-gray-100 p-2 break-all'><p>Recived Message</p></div>
           </div>
 
-          <div className='flex m-1.5 sm:py-1 md:py-1 lg:py-2 rounded-md border border-gray-200 bg-gray-100'><input type="text" className='outline-none border-none w-full bg-transparent text-sm pl-2'/><PhotoLibraryIcon style={{ marginRight: 10 }}/>  <FavoriteBorderIcon style={{ marginRight: 10 }}/></div>
+          <div className='flex m-1.5 sm:py-1 md:py-1 lg:py-2 rounded-md border border-gray-200 bg-gray-100'>
+          <input 
+            type="text"
+            className='outline-none border-none w-full bg-transparent text-sm pl-2'
+            placeholder="Write a messsage" 
+            value={message}
+            onChange={getMessagesValues}
+
+           />
+          {send?<>
+          
+          <div className={'animation1'} onClick={sendPing}>
+          <SendIcon style={{marginRight: 5 }}/>
+          </div>
+          </> :
+          <>
+         
+          <div className='animation2'>
+          <PhotoLibraryIcon style={{ marginRight: 10 }}/>
+          <FavoriteBorderIcon style={{ marginRight: 10 }}/>
+          </div>
+          </>
+          }
+          </div>
         </RightItems>
 
       </div>

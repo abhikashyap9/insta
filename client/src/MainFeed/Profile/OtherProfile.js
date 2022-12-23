@@ -6,7 +6,9 @@ import { useParams } from 'react-router-dom';
 // import auth from '../../LoginAuth/auth';
 import tw from 'tailwind-styled-components'
 import UserProfile from '../../services/userProfile.service';
+import { Link } from 'react-router-dom';
 
+const MessageButton=tw.button`${props => props.primary ? "bg-sky-500 text-white px-4" : "bg-white-100 px-2" } border border-gray-200  py-0.5 rounded-sm`
 function OtherProfile() {
   const {id} = useParams();
   const [ otherUser,setOtherUser ] = useState([])
@@ -40,7 +42,7 @@ function OtherProfile() {
 
   }
 
-
+  console.log(otherUser);
 
   let otherUsers=otherUser?.followers?.includes(userId)
  
@@ -63,6 +65,8 @@ function OtherProfile() {
                 editProfile={workFunction}
                 followerCount={otherUser?.followers?.length}
                 followingCount={otherUser?.following?.length}
+                message={<Link to={`/message/${otherUser.id}`}> <MessageButton>Message</MessageButton></Link>}
+
               />
             </div>   
       </div>

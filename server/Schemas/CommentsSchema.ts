@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose';
 
 const Comments = new mongoose.Schema({
 	commentedBy: {
@@ -33,4 +33,4 @@ Comments.set('toJSON', {
 
 process.setMaxListeners(0)
 
-module.exports = mongoose.model('comments', Comments)
+export default mongoose.model('comments', Comments)
