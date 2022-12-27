@@ -40,7 +40,7 @@ function App() {
               <Route path="explore" element={<Explore />} />
               <Route path="addimages" element={<AddImages />} />
               <Route path="notification" element={<Notification />} />
-              <Route path="message" element={<Message />} />
+              <Route path="message/:id" element={<Message/>} />
                   
               </Route>
               <Route>

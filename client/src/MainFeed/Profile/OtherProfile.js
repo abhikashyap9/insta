@@ -6,9 +6,12 @@ import { useParams } from 'react-router-dom';
 // import auth from '../../LoginAuth/auth';
 import tw from 'tailwind-styled-components'
 import UserProfile from '../../services/userProfile.service';
+import { Link } from 'react-router-dom';
+import Messages from '../../services/message.service';
 
+const MessageButton=tw.button`${props => props.primary ? "bg-sky-500 text-white px-4" : "bg-white-100 px-2" } border border-gray-200  py-0.5 rounded-sm`
 function OtherProfile() {
-  const {id} = useParams();
+  const {id} = useParams()
   const [ otherUser,setOtherUser ] = useState([])
   const [followDone,setFollowDone] = useState(0)
 
@@ -23,31 +26,26 @@ function OtherProfile() {
   
   const follow=()=>{
     UserProfile.userFollow(id,auth).then((res)=>{
-      console.log(res)
       setFollowDone(1)
-      
-    })
+    })}
 
-  }
-  
-  const unfollow=()=>{
-    
+  const unfollow=()=>{   
     UserProfile.userUnfollow(id,auth).then((res)=>{
-      console.log(res)
       setFollowDone(2)
- 
     })
-
   }
-
-
 
   let otherUsers=otherUser?.followers?.includes(userId)
- 
-
   let buttonData   = otherUsers  ? 'Unfollow':'Follow'
   let workFunction = otherUsers  ? unfollow : follow
-
+  console.log(auth)
+  
+  const createRoom=(userId)=>{
+    Messages.createRoom(userId,auth).then((res)=>{
+      console.log(res)
+    })
+    
+  }
 
 
   return (
@@ -63,6 +61,7 @@ function OtherProfile() {
                 editProfile={workFunction}
                 followerCount={otherUser?.followers?.length}
                 followingCount={otherUser?.following?.length}
+                message={<Link to={`/message/${otherUser.id}`} > <MessageButton onClick={()=>createRoom(otherUser.id)}>Message</MessageButton></Link>}
               />
             </div>   
       </div>
