@@ -50,9 +50,9 @@ signrouter.post('/login', async (req: Request, res: Response) => {
 	console.log('req', req.body)
 
 	const user = await Signupuser.findOne({ email })
-	console.log(user)
+	console.log('user',user)
 	const passwordCorrect = await bcrypt.compare(password, user?.password!)
-
+    
 	if (!(user && passwordCorrect)) {
 		return res.status(401).json({ error: 'Invalid Password' })
 	}

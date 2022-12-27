@@ -1,14 +1,13 @@
 import mongoose from 'mongoose';
 
 const Conversation =new mongoose.Schema({
-    sender:{
-        type: mongoose.Schema.Types.ObjectId,
-		ref: 'signupuser',
-    },
-    reciever:{
-        type: mongoose.Schema.Types.ObjectId,
-		ref: 'signupuser',
-    }
+    chatMembers:{
+	type:Array,
+	ref:'signupuser'
+	},
+	createdBy:{
+		type:String
+	}
 })
 
 Conversation.set('toJSON', {

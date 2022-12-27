@@ -26,9 +26,22 @@ async function main() {
 main()
   io.on("connection",(socket:any)=>{
           console.log('Connection Established')
-          socket.on('ping', (msg:any) => {
-              console.log('message: ' + msg)
+        
+          socket.on("join_room", (data:any) => {
+            socket.join(data);
+            console.log(`User with ID: ${socket.id} joined room: ${data}`);
+          });
+
+          socket.on('ping', (data:any) => {
+            console.log('data',data)
+            socket.to(data.room).emit("receive_message", data);
+            console.log(data)
             });
+
+            socket.on("disconnect", () => {
+              console.log("User Disconnected", socket.id);
+            });
+
       })
 
 // const server = http.createServer(app)

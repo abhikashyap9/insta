@@ -10,6 +10,9 @@ import '../../App.css'
 import io from 'socket.io-client';
 import { useParams } from 'react-router-dom';
 import UserProfile from '../../services/userProfile.service';
+import Messages from '../../services/message.service';
+import SentMessages from './SentMessages';
+import RecievedMessage from './RecievedMessage'
 
 const socket=io.connect('http://localhost:3001');
 console.log(socket)
@@ -32,10 +35,13 @@ function Message() {
   const [lastPong,setLastPong]=useState(null);
   const [message,setMessage]=useState('');
   const [user,setUser]=useState({profilePic:'',name:''})
+  const [room,setRoom]=useState([]);
+  const [showMessages,setShowMessages]=useState([])
+  const [currentUser,setCurrentUser]=useState([])
 
   const {id} = useParams();
-  console.log(id)
-
+  
+  let auth=localStorage.getItem("token")
   useEffect(() => {
     UserProfile.getUserById(id).then((res)=>{
       setUser(res.data)
@@ -44,8 +50,29 @@ function Message() {
       const profileImage=profilePicture[0]    
       setUser({...user,profilePic:profileImage,name:userName})
     })
+
+    UserProfile.userGet(auth).then((res)=>{
+     console.log(res)
+     setCurrentUser(res.data.userName)
+    })
   }, [])
-  console.log(user)
+
+ useEffect(()=>{
+  Messages.getRoom(id,auth).then((res)=>{
+    console.log('getRoom',res)
+    socket.emit("join_room", res.data[0].id);
+    let room=res.data[0].id
+    setRoom(room)
+    console.log('joined room',res.data[0].id)
+  })
+
+  Messages.getCurrentUserRoom(auth).then((res)=>{
+    // console.log(res)
+  })
+
+ },[])
+  
+  // console.log(user)
 
   useEffect(()=>{
     socket.on('connect',()=>{
@@ -65,12 +92,9 @@ function Message() {
       socket.off('pong')
     }
   },[])
-
-  console.log(isConnected)
-  console.log(lastPong)
+  
 
   const getMessagesValues=(e)=>{
-  console.log(e.target.value)
   let messageValue=e.target.value;
   setMessage(messageValue)
    if(messageValue.length>0){
@@ -81,22 +105,29 @@ function Message() {
     setSend(false)
   }}
 
-  const  sendPing= async()=>{
-    console.log(message);
+  const sendPing= async()=>{
     const messageData={
       room:room,
       message:message,
+      author:currentUser,
       time: new Date(Date.now()).getHours() +
       ":" +
       new Date(Date.now()).getMinutes(),
     }
    await socket.emit('ping',messageData);
+   setShowMessages((list)=>[...list,messageData])
    setMessage('')
+
   }
 
-
-
-
+  useEffect(() => {
+    socket.off('receive_message').on("receive_message", (data) => {
+      console.log(data)
+      setShowMessages((list)=>[...list,data])
+    })
+  }, [socket])
+  console.log(showMessages)
+ 
   return (
     <div>
       <div className='flex border border-gray-100 bg-white'>
@@ -144,8 +175,12 @@ function Message() {
           </div>
 
           <div className='m-1.5'>
-            <div className='border px-2 rounded-xl w-1/2 p-2 break-all '><p>Message Sent</p></div>
-            <div className='border px-2 rounded-xl ml-auto w-1/2 bg-gray-100 p-2 break-all'><p>Recived Message</p></div>
+            {/* <SentMessages 
+                        showMessages={showMessages}/>
+            
+            <RecievedMessage
+                        showMessages={showMessages}/> */}
+            
           </div>
 
           <div className='flex m-1.5 sm:py-1 md:py-1 lg:py-2 rounded-md border border-gray-200 bg-gray-100'>
@@ -165,7 +200,7 @@ function Message() {
           </> :
           <>
          
-          <div className='animation2'>
+          <div className='flex animation2'>
           <PhotoLibraryIcon style={{ marginRight: 10 }}/>
           <FavoriteBorderIcon style={{ marginRight: 10 }}/>
           </div>
