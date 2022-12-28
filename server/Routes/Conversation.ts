@@ -112,50 +112,22 @@ conversationRouter.get(
 // })
 
 conversationRouter.post(
-  "/savedMessages/",
+  "/savedMessages/:id",
   userAuthentication,
-  async (req: RequestAuthType, res: Response) => {
+  async (req: any, res: Response) => {
     const { messages } = req.body; //otheruser
-    console.log(messages);
-
-    // let senderId = req["auth"]?.userId; // person who uses id auth
-
-    // let user = await Signupuser.findById(senderId);
-
-    // let conversation = new Conversation({
-    //   chatMembers: { userId: id, messangerId: senderId },
-    //   createdBy: `${user?.userName} created this chat`,
-    // });
-
-    let savedMessages = new savedMessages({
-      messages: messages,
-    });
+    // console.log(req.body);
+    const { id } = req.params;
+    console.log("my", messages);
 
     try {
-      let userRoomExits = await Conversation.find({
-        chatMembers: {
-          $elemMatch: {
-            userId: id,
-          },
-        },
-      });
-
-      let userChatExits = await Conversation.find({
-        chatMembers: {
-          $elemMatch: {
-            userId: senderId,
-          },
-        },
-      });
-      if (userRoomExits.length > 0) {
-        return res.status(401).json(userRoomExits);
-      }
-      if (userChatExits.length > 0) {
-        return res.status(401).json(userRoomExits);
-      }
-
-      let savedConversation = await conversation.save();
-      res.status(201).json(savedConversation);
+      let userRoomExits = await Conversation.findByIdAndUpdate(
+        id,
+        { $push: { messages: { $each: messages } } },
+        { new: true }
+      );
+      // console.log("userrrooommmm", userRoomExits);
+      res.status(200).json(userRoomExits);
     } catch (err) {
       console.log(err);
       res.status(400).json({ error: err });

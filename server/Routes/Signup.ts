@@ -83,7 +83,6 @@ const getTokenFrom = (request: Request) => {
 };
 
 signrouter.get("/userprofile/i", async (req: Request, res: Response, next) => {
-  console.log(req);
   const token = getTokenFrom(req);
   const decodedToken = jwt.verify(token!, process.env.SECRET!) as UserType;
 
