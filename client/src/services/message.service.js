@@ -32,19 +32,25 @@ const getCurrentUserRoom = (auth) => {
   });
 };
 
-const savedMessages = (id, auth, messages) => {
+const savedMessages = (id, auth, messageData) => {
   let url = baseUrl + `/savedMessages/${id}`;
-  return axios.post(url, messages, {
+  return axios.post(url, messageData, {
     headers: {
       Authorization: `Bearer ${auth}`,
     },
   });
 };
 
+const getMessages=(id)=>{
+  let url = baseUrl + `/getMessages/${id}`;
+  return axios.get(url)
+}
+
 const Messages = {
   createRoom,
   getRoom,
   getCurrentUserRoom,
   savedMessages,
+  getMessages
 };
 export default Messages;

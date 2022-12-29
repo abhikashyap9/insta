@@ -82,9 +82,10 @@ const getTokenFrom = (request: Request) => {
   return null;
 };
 
-signrouter.get("/userprofile/i", async (req: Request, res: Response, next) => {
+signrouter.get("/userprofile/i", async (req: Request, res: Response) => {
   const token = getTokenFrom(req);
   const decodedToken = jwt.verify(token!, process.env.SECRET!) as UserType;
+  console.log(token)
 
   if (!decodedToken.id) {
     return res.status(401).json({ error: "token missing or invalid token" });
@@ -92,9 +93,14 @@ signrouter.get("/userprofile/i", async (req: Request, res: Response, next) => {
 
   try {
     let user = await Signupuser.findById(decodedToken.id);
-    res.status(200).json(user).end();
+    console.log('user',user);
+    if(user){
+      return res.status(200).json(user).end()
+    }
+    
   } catch (err) {
-    console.log(err);
+    // console.log(''merr);
+    res.status(400).json({err:err})
   }
 });
 

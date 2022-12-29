@@ -2,6 +2,10 @@ import axios from "axios";
 
 const baseUrl='http://localhost:3001'
 
+const getUserById = (id)=>{
+    let url = baseUrl +`/otherprofile/${id}`;
+    return axios.get(url)
+}
 const userGet =(auth)=>{
     let url = baseUrl + '/userprofile/i';
     return axios.get(url,{headers:{'Authorization': `Bearer ${auth}`}})
@@ -12,10 +16,6 @@ const userImage =(auth)=>{
     return axios.get(url,{headers:{'Authorization': `Bearer ${auth}`}})
 }
 
-const getUserById = (id)=>{
-    let url = baseUrl +`/otherprofile/${id}`;
-    return axios.get(url)
-}
 const userFollow =(id,auth)=>{
     let url =baseUrl + `/follow/${id}`;
     return axios.put(url,{},{headers:{'Authorization': `Bearer ${auth}`}});

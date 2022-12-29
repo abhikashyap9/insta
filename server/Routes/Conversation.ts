@@ -10,10 +10,7 @@ export interface RequestAuthType extends Request {
   auth?: { userId?: string };
 }
 
-conversationRouter.post(
-  "/createConversation/:id",
-  userAuthentication,
-  async (req: RequestAuthType, res: Response) => {
+conversationRouter.post("/createConversation/:id",userAuthentication,async (req: RequestAuthType, res: Response) => {
     const { id } = req.params; //otheruser
     let senderId = req["auth"]?.userId; // person who uses id auth
 
@@ -79,10 +76,10 @@ conversationRouter.get(
         },
       });
       if (savedConversation.length > 0) {
-        res.status(200).json(savedConversation);
+        return res.status(200).json(savedConversation);
       }
       if (savedConversation1.length > 0) {
-        res.status(200).json(savedConversation1);
+        return res.status(200).json(savedConversation1);
       }
     } catch (err) {
       res.status(400).json({ error: err });
@@ -90,44 +87,74 @@ conversationRouter.get(
   }
 );
 
-// conversationRouter.get('/getUserRoom',userAuthentication,async(req:RequestAuthType,res:Response)=>{
+conversationRouter.get('/getUserRoom',userAuthentication,async(req:RequestAuthType,res:Response)=>{
 
-// 	let userId = req['auth']?.userId
+	let userId = req['auth']?.userId
 
-//     try{
-//        let savedConversation = await Conversation.find({
-//         chatMembers: {
-//           $elemMatch: {
-//             messangerId: userId,
-//             senderId:userId
-//           }
-//         }
-//       })
-//        res.status(200).json(savedConversation)
-//     }
-//     catch(err){
-//        console.log(err)
-//        res.status(400).json({error:err})
-//     }
-// })
+    try{
+       let savedConversation = await Conversation.find({
+        chatMembers: {
+          $elemMatch: {
+            messangerId: userId,
+          }
+        }
+      })
+      
+      let savedConversation1 = await Conversation.find({
+        chatMembers: {
+          $elemMatch: {
+            senderId:userId
+          }
+        }
+      })
+      let allConversation=savedConversation.concat(savedConversation1);
+
+      // console.log('SAcedddd',savedConversation,savedConversation1);
+
+
+         if(savedConversation){
+          return res.status(200).json(allConversation)
+         }
+       
+    }
+    catch(err){
+       console.log(err)
+       res.status(400).json({error:err})
+    }
+})
 
 conversationRouter.post(
   "/savedMessages/:id",
   userAuthentication,
   async (req: any, res: Response) => {
-    const { messages } = req.body; //otheruser
-    // console.log(req.body);
+    const { messageData } = req.body; //otheruser
+    console.log(req.body);
     const { id } = req.params;
-    console.log("my", messages);
+    console.log("my", messageData);
 
     try {
       let userRoomExits = await Conversation.findByIdAndUpdate(
         id,
-        { $push: { messages: { $each: messages } } },
+        { $push: { messages: messageData } },
         { new: true }
       );
       // console.log("userrrooommmm", userRoomExits);
-      res.status(200).json(userRoomExits);
+      res.status(201).json(userRoomExits);
+    } catch (err) {
+      console.log(err);
+      res.status(400).json({ error: err });
+    }
+  }
+);
+
+conversationRouter.get(
+  "/getMessages/:id",
+  userAuthentication,
+  async (req: any, res: Response) => {
+    const { id } = req.params;
+    try {
+      let conversation = await Conversation.findById(id);
+      res.status(200).json(conversation);
     } catch (err) {
       console.log(err);
       res.status(400).json({ error: err });

@@ -58,8 +58,8 @@ function MainFeedIndex() {
           !isDesktopResolution && <div>
             <Sidebar/> </div>
         }
-
-        <div className="sm:basis-1/2 lg:basis-2/5 md:basis-2/5 xs:basis-full top w-s">
+        {/* sm:basis-1/2 lg:basis-2/5 md:basis-2/5 xs:basis-full top w-s */}
+        <div className="">
           <Outlet/>
         </div>
           <div className="lg:basis-1/5 md:basis-0 xs:basis-0 sm:basis-0">
