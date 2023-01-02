@@ -11,22 +11,22 @@ import io from "socket.io-client";
 import { useParams } from "react-router-dom";
 import UserProfile from "../../services/userProfile.service";
 import Messages from "../../services/message.service";
-import SentMessages from "./SentMessages";
-import RecievedMessage from "./RecievedMessage";
+import { useSelector, useDispatch } from 'react-redux'
+
 
 const socket = io.connect("http://localhost:3001");
 console.log(socket);
 
 // import {animate__slideOutRight} from 'react-animations/lib/animate__slideOutRight'
 
-const LeftItems = tw.div` border-r-indigo-200 border-gray-800 basis-2/5 border-r`;
+const LeftItems = tw.div`border-gray-200 basis-2/5 border-r`;
 const Header = tw.div`border-b py-3 text-center h-14`;
 const MessageInfo1 = tw.div`flex py-2 cursor-pointer pl-2`;
 const MessageInfo = tw.div`flex py-1.5 cursor-pointer pl-2 items-center`;
 const Right = tw.div``;
 const ImageContainer = tw.div`pr-2`;
 const MessagesName = tw.div``;
-const RightItems = tw.div`basis-3/5`;
+const RightItems = tw.div`basis-3/5 relative`;
 
 function Message() {
   const [send, setSend] = useState(false);
@@ -35,9 +35,10 @@ function Message() {
   const [message, setMessage] = useState("");
   const [user, setUser] = useState({ profilePic: "", name: "" });
   const [room, setRoom] = useState([]);
-  const [showMessages, setShowMessages] = useState([])
-  const [currentUser, setCurrentUser] = useState([])
-  const [savedMessages,setSavedMessages] = useState([])
+  const [showMessages, setShowMessages] = useState([]);
+  const [currentUser, setCurrentUser] = useState([]);
+  const [savedMessages, setSavedMessages] = useState([]);
+  const [chatList, setChatList] = useState([]);
 
   const { id } = useParams();
 
@@ -61,28 +62,38 @@ function Message() {
       socket.emit("join_room", res.data[0].id);
       let room = res.data[0].id;
       setRoom(room);
-      let data=res.data[0].messages
-      console.log('data',data)
+      let data = res.data[0].messages;
+      console.log("data", data);
       setShowMessages(data);
       console.log("joined room", res.data[0].id);
     });
 
     Messages.getCurrentUserRoom(auth).then((res) => {
-      console.log('Response',res)
+      console.log("Response", res);
+      let data = res.data;
+      let userId = data.map((curr) => curr.chatMembers[0]).map((curr) => curr.userId);
+      let messanderId = data.map((curr) => curr.chatMembers[0]).map((curr) => curr.messangerId);
+      let userChat = [];
+      for(let i=0;i<messanderId.length;i++){
+        if(Object.keys(userId[i]).length<Object.keys(messanderId[i]).length){
+         userChat.push(userId[i]);
+      }else{
+           userChat.push(messanderId[i]);
+      }}
+      setChatList(userChat);
     });
-
-   
   }, []);
 
+  console.log(chatList);
+
   // useEffect(() => {
-   
+
   //   setTimeout(() => {
   //     console.log(room)
   //     Messages.getMessages(room).then((res) => {
   //       console.log(res)
   //     });
   //   }, 1000);
-   
 
   // }, []);
 
@@ -95,27 +106,25 @@ function Message() {
 
     socket.on("disconnect", () => {
       setIsConnected(false);
-    })
+    });
 
     socket.on("pong", () => {
       setLastPong(new Date().toISOString());
-    })
+    });
     return () => {
       socket.off("connect");
       socket.off("disconnect");
       socket.off("pong");
-      
-    }
-      
-  }, [socket])
+    };
+  }, [socket]);
 
   console.log(room, auth, showMessages);
 
   const getMessagesValues = (e) => {
     let messageValue = e.target.value;
     setMessage(messageValue);
-  
-    if (messageValue.length > 0) {
+
+    if (messageValue.length > 1) {
       setSend(true);
     } else {
       setSend(false);
@@ -134,17 +143,16 @@ function Message() {
     };
     await socket.emit("ping", messageData);
     setShowMessages((list) => [...list, messageData]);
-    setMessage(null);
-    let data={
-      messageData:messageData
-    }
+    setMessage('');
+    let data = {
+      messageData: messageData,
+    };
 
     Messages.savedMessages(room, auth, data).then((res) => {
       console.log(room, auth, showMessages);
       console.log(res);
     });
   };
-  
 
   useEffect(() => {
     socket.off("receive_message").on("receive_message", (data) => {
@@ -152,30 +160,37 @@ function Message() {
       setShowMessages((list) => [...list, data]);
     });
   }, [socket]);
- 
-console.log(savedMessages);
+
+  console.log(message);
+  const count = useSelector((state) => state.value)
+
+  console.log('count',count)
   return (
-    <div>
-      <div className="flex border border-gray-100 bg-white ">
+    <div className="lg:w-4/5 sm:w-full">
+      <div className="messages_container  flex border border-gray-200 bg-white  m-6">
         <LeftItems>
           <Header>
             <p>{currentUser}</p>
           </Header>
-          <MessageInfo1>
-            <ImageContainer className="">
-              <img
-                className="inline-block h-12 w-12 rounded-full ring-2 ring-white"
-                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbrvOZf5zaHg_9a8upGltfVtObFu_0QH1rcw&usqp=CAU"
-                alt="image"
-              />
-            </ImageContainer>
-            <div className="text-xs">
-              <p className="text-sm">{user.userName}</p>
-              <p className="text-xs text-gray-400">Sent you a message</p>
-            </div>
-          </MessageInfo1>
+          {chatList.map((curr) => {
+            return(
+            <MessageInfo1>
+              <ImageContainer className="">
+                <img
+                  className="inline-block h-12 w-12 rounded-full ring-2 ring-white"
+                  src={`${curr.profilePicture.length>0? `http://localhost:3001/${curr?.profilePicture[0]}`:'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'}`}
+                  alt="image"
+                />
+              </ImageContainer>
+              <div className="text-xs">
+                <p className="text-sm">{curr.userName}</p>
+                <p className="text-xs text-gray-400">Sent you a message</p>
+              </div>
+            </MessageInfo1>
+            )
+          })}
         </LeftItems>
-
+       
         <RightItems>
           <div className="border-b flex items-center justify-between px-2 h-14 ">
             <MessageInfo>
@@ -204,21 +219,28 @@ console.log(savedMessages);
             </div>
           </div>
 
-          <div className="m-1.5 pt-8">
-            
-            {
-           showMessages && showMessages.map((curr)=>{
-           return( <div className={`${curr.author===currentUser?'border px-2 rounded-xl w-1/2 p-2 break-all mb-2 bg-gradient-to-r from-pink-400 to-purple-500':'text-gray-50 border px-2 rounded-xl ml-auto w-1/2 bg-gradient-to-r from-purple-400 to-pink-500 p-2 break-all mb-2 '}` }>
-           <p>{curr.message}</p><span>{curr.time}</span>
-           </div>
-            )
-           })
-          }
+          <div className="p-2 pb-4 overflow-y-scroll h-3/4">
+            {showMessages &&
+              showMessages.map((curr) => {
+                return (
+                  <div
+                    className={`${
+                      curr.author === currentUser
+                        ? "border px-2 rounded-xl w-1/2 p-2 break-all mb-2 bg-gradient-to-r from-pink-400 to-purple-500"
+                        : "text-gray-50 border px-2 rounded-xl ml-auto w-1/2 bg-gradient-to-r from-purple-400 to-pink-500 p-2 break-all mb-2 "
+                    }`}
+                  >
+                    <p>{curr.message}</p>
+                    <span>{curr.time}</span>
+                  </div>
+                );
+              })}
             {/* <RecievedMessage
                         showMessages={showMessages}/>  */}
           </div>
-
-          <div className="flex m-1.5 sm:py-1 md:py-1 lg:py-2 rounded-md border border-gray-200 bg-gray-100 sticky bottom-0 w-11/12 px-1">
+         
+         <div className="absolute bottom-0 w-full py-2 px-3">
+          <div className="flex rounded-md border border-gray-200 bg-gray-100 py-2">
             <input
               type="text"
               className="outline-none border-none w-full bg-transparent text-sm pl-2"
@@ -226,7 +248,7 @@ console.log(savedMessages);
               value={message}
               onChange={getMessagesValues}
             />
-            {console.log('ddd',send)||send ? (
+            {console.log("ddd", send) || send ? (
               <>
                 <div className={"animation1"} onClick={sendPing}>
                   <SendIcon style={{ marginRight: 5 }} />
@@ -240,6 +262,7 @@ console.log(savedMessages);
                 </div>
               </>
             )}
+          </div>
           </div>
         </RightItems>
       </div>

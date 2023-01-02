@@ -17,7 +17,7 @@ conversationRouter.post("/createConversation/:id",userAuthentication,async (req:
     let user = await Signupuser.findById(senderId);
 
     let conversation = new Conversation({
-      chatMembers: { userId: id, messangerId: senderId },
+      chatMembers: [{ userId: id, messangerId: senderId }],
       createdBy: `${user?.userName} created this chat`,
     });
 
@@ -37,6 +37,16 @@ conversationRouter.post("/createConversation/:id",userAuthentication,async (req:
           },
         },
       });
+
+      // let userChatRoom =await Conversation.find({
+      //   chatMembers: {
+      //     $elemMatch: {
+      //       userId: senderId,
+      //     },
+      //   },
+      // });
+
+
       if (userRoomExits.length > 0) {
         return res.status(401).json(userRoomExits);
       }
@@ -61,20 +71,16 @@ conversationRouter.get(
 
     try {
       let savedConversation = await Conversation.find({
-        chatMembers: {
-          $elemMatch: {
-            userId: id,
-          },
-        },
-      });
+        "chatMembers.userId": id,
+        
+      })
 
       let savedConversation1 = await Conversation.find({
-        chatMembers: {
-          $elemMatch: {
-            messangerId: id,
-          },
-        },
+        "chatMembers.messangerId": id,
+        
       });
+      console.log('SavedConversation',savedConversation)
+      console.log('SavedConversation1',savedConversation1)
       if (savedConversation.length > 0) {
         return res.status(200).json(savedConversation);
       }
@@ -98,7 +104,11 @@ conversationRouter.get('/getUserRoom',userAuthentication,async(req:RequestAuthTy
             messangerId: userId,
           }
         }
-      })
+      }).populate({path: 'chatMembers',
+          populate: {
+            path: 'userId',
+            model:'signupuser' 
+        }}).exec()
       
       let savedConversation1 = await Conversation.find({
         chatMembers: {
@@ -106,10 +116,9 @@ conversationRouter.get('/getUserRoom',userAuthentication,async(req:RequestAuthTy
             senderId:userId
           }
         }
-      })
+      }).populate('chatMembers.messangerId').exec()
       let allConversation=savedConversation.concat(savedConversation1);
 
-      // console.log('SAcedddd',savedConversation,savedConversation1);
 
 
          if(savedConversation){
@@ -119,7 +128,7 @@ conversationRouter.get('/getUserRoom',userAuthentication,async(req:RequestAuthTy
     }
     catch(err){
        console.log(err)
-       res.status(400).json({error:err})
+      return res.status(400).json({error:err})
     }
 })
 

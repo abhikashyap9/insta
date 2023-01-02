@@ -18,7 +18,7 @@ import OtherProfile from './MainFeed/Profile/OtherProfile';
 
 
 function App() {
-  
+
   return (
 
     <>

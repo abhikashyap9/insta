@@ -147,3 +147,6 @@ input.form-control {
   opacity:1;
 }
 }
+.messages_container{
+  height:80vh;
+}

@@ -1,20 +1,29 @@
 import mongoose from "mongoose";
-
+import autopopulate from 'mongoose-autopopulate'
 const Conversation = new mongoose.Schema({
   chatMembers: {
-    type: Array,
-    ref: "signupuser",
+    type:Array,
+    userId:{
+    type: mongoose.Schema.Types.ObjectId,
+		ref: 'signupuser',
+    autopopulate: true
+    },
+    messangerId:{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'signupuser',
+      autopopulate: true
+    }
   },
-
   createdBy: {
     type: String,
   },
-
   messages: {
     type: Array,
     ref: "conversation",
   },
 });
+Conversation.plugin(autopopulate);
+
 
 Conversation.set("toJSON", {
   transform: (document: any, returnedObject: any) => {
