@@ -7,7 +7,7 @@ const getUserById = (id)=>{
     return axios.get(url)
 }
 const userGet =(auth)=>{
-    let url = baseUrl + '/userprofile/i';
+    let url = baseUrl+'/userprofile/i';
     return axios.get(url,{headers:{'Authorization': `Bearer ${auth}`}})
 }
 

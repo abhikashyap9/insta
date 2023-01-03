@@ -15,6 +15,7 @@ conversationRouter.post("/createConversation/:id",userAuthentication,async (req:
     let senderId = req["auth"]?.userId; // person who uses id auth
 
     let user = await Signupuser.findById(senderId);
+    console.log('Signupuser',user)
 
     let conversation = new Conversation({
       chatMembers: [{ userId: id, messangerId: senderId }],
@@ -26,6 +27,8 @@ conversationRouter.post("/createConversation/:id",userAuthentication,async (req:
         chatMembers: {
           $elemMatch: {
             userId: id,
+            messangerId:senderId
+            
           },
         },
       });
@@ -34,9 +37,12 @@ conversationRouter.post("/createConversation/:id",userAuthentication,async (req:
         chatMembers: {
           $elemMatch: {
             userId: senderId,
+            messangerId:id
           },
         },
       });
+      console.log(userRoomExits)
+      console.log(userChatExits)
 
       // let userChatRoom =await Conversation.find({
       //   chatMembers: {
@@ -70,22 +76,47 @@ conversationRouter.get(
     let senderId = req["auth"]?.userId;
 
     try {
-      let savedConversation = await Conversation.find({
-        "chatMembers.userId": id,
+      // let savedConversation = await Conversation.find({
+      //   "chatMembers.userId": id,
         
-      })
-
-      let savedConversation1 = await Conversation.find({
-        "chatMembers.messangerId": id,
+      // })
+      let userRoomExits = await Conversation.find({
+        chatMembers: {
+          $elemMatch: {
+            userId: id,   //other user
+            messangerId:senderId //auth
+            
+          },
+        },
+      }).populate({path: 'chatMembers',
+      populate: {
+        path: 'userId',
+        model:'signupuser' 
+    }}).exec()
+      
+      let userChatExits = await Conversation.find({
+        chatMembers: {
+          $elemMatch: {
+            userId: senderId, //auth
+            messangerId:id  //otheruser
+          },
+        },
+      }).populate({path: 'chatMembers',
+      populate: {
+        path: 'messangerId',
+        model:'signupuser' 
+    }}).exec()
+      // let savedConversation1 = await Conversation.find({
+      //   "chatMembers.messangerId": id,
         
-      });
-      console.log('SavedConversation',savedConversation)
-      console.log('SavedConversation1',savedConversation1)
-      if (savedConversation.length > 0) {
-        return res.status(200).json(savedConversation);
+      // });
+      // console.log('SavedConversation',savedConversation)
+      // console.log('SavedConversation1',savedConversation1)
+      if (userRoomExits.length > 0) {
+        return res.status(200).json(userRoomExits);
       }
-      if (savedConversation1.length > 0) {
-        return res.status(200).json(savedConversation1);
+      if (userChatExits.length > 0) {
+        return res.status(200).json(userChatExits);
       }
     } catch (err) {
       res.status(400).json({ error: err });
@@ -113,10 +144,14 @@ conversationRouter.get('/getUserRoom',userAuthentication,async(req:RequestAuthTy
       let savedConversation1 = await Conversation.find({
         chatMembers: {
           $elemMatch: {
-            senderId:userId
+            userId:userId
           }
         }
-      }).populate('chatMembers.messangerId').exec()
+      }).populate({path: 'chatMembers',
+      populate: {
+        path: 'messangerId',
+        model:'signupuser' 
+    }}).exec()
       let allConversation=savedConversation.concat(savedConversation1);
 
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState ,useRef } from "react";
 import tw from "tailwind-styled-components";
 import CallIcon from "@mui/icons-material/Call";
 import VideoCallIcon from "@mui/icons-material/VideoCall";
@@ -53,24 +53,22 @@ function Message() {
     });
 
     UserProfile.userGet(auth).then((res) => {
-      console.log(res);
       setCurrentUser(res.data.userName);
     });
 
     Messages.getRoom(id, auth).then((res) => {
-      console.log("getRoom", res);
       socket.emit("join_room", res.data[0].id);
       let room = res.data[0].id;
       setRoom(room);
       let data = res.data[0].messages;
-      console.log("data", data);
-      setShowMessages(data);
-      console.log("joined room", res.data[0].id);
+      setShowMessages(data)
+      console.log(res)
     });
 
     Messages.getCurrentUserRoom(auth).then((res) => {
-      console.log("Response", res);
+      
       let data = res.data;
+      console.log(data)
       let userId = data.map((curr) => curr.chatMembers[0]).map((curr) => curr.userId);
       let messanderId = data.map((curr) => curr.chatMembers[0]).map((curr) => curr.messangerId);
       let userChat = [];
@@ -84,7 +82,10 @@ function Message() {
     });
   }, []);
 
-  console.log(chatList);
+  console.log('ChatList',chatList)
+  console.log('show',showMessages)
+
+
 
   // useEffect(() => {
 
@@ -118,13 +119,14 @@ function Message() {
     };
   }, [socket]);
 
-  console.log(room, auth, showMessages);
+ 
 
   const getMessagesValues = (e) => {
     let messageValue = e.target.value;
+    
     setMessage(messageValue);
 
-    if (messageValue.length > 1) {
+    if (messageValue.length >= 1) {
       setSend(true);
     } else {
       setSend(false);
@@ -132,6 +134,7 @@ function Message() {
   };
 
   const sendPing = async () => {
+    
     const messageData = {
       room: room,
       message: message,
@@ -149,24 +152,55 @@ function Message() {
     };
 
     Messages.savedMessages(room, auth, data).then((res) => {
-      console.log(room, auth, showMessages);
+      
       console.log(res);
     });
   };
 
   useEffect(() => {
     socket.off("receive_message").on("receive_message", (data) => {
-      console.log(data);
+     
       setShowMessages((list) => [...list, data]);
     });
+    return function cleanup() {
+      socket.off("receive_message");
+    };
   }, [socket]);
+  
+  const setChat=(id)=>{
+   console.log(id)
+   Messages.getRoom(id, auth).then((res) => {
+    let data=res.data
+    socket.emit("join_room", data[0].id);
+    let room = data[0].id;
+    setRoom(room);
+    let messages = data[0].messages;
+    setShowMessages(messages)
+    console.log(res)
+    let userId=Object.keys(data[0].chatMembers[0].userId).length
+let messangerId=Object.keys(data[0].chatMembers[0].messangerId).length
 
-  console.log(message);
-  const count = useSelector((state) => state.value)
+if(userId>messangerId){
+    console.log(data[0].chatMembers[0].messangerId);
+    let profileImage=data[0].chatMembers[0].messangerId.profilePicture[0]
+    let name=data[0].chatMembers[0].messangerId.userName
+    setUser({ ...user, profilePic: profileImage, name: name });
+}else{
+    console.log(data[0].chatMembers[0].userId)
+    let profileImage=data[0].chatMembers[0].userId.profilePicture[0];
+    let name=data[0].chatMembers[0].userId.userName
+    setUser({ ...user, profilePic: profileImage, name: name })
+}
+  });
+  }
+ 
+  socket.on('typing', (room) => {
+    console.log(` ${room} is typing...`);
+  });
 
-  console.log('count',count)
+  
   return (
-    <div className="lg:w-4/5 sm:w-full">
+    <div className="lg:w-4/5 md:w-full sm:w-full">
       <div className="messages_container  flex border border-gray-200 bg-white  m-6">
         <LeftItems>
           <Header>
@@ -174,7 +208,7 @@ function Message() {
           </Header>
           {chatList.map((curr) => {
             return(
-            <MessageInfo1>
+            <MessageInfo1 onClick={()=>setChat(curr.id)}>
               <ImageContainer className="">
                 <img
                   className="inline-block h-12 w-12 rounded-full ring-2 ring-white"
@@ -221,7 +255,7 @@ function Message() {
 
           <div className="p-2 pb-4 overflow-y-scroll h-3/4">
             {showMessages &&
-              showMessages.map((curr) => {
+              showMessages.map((curr,index) => {
                 return (
                   <div
                     className={`${
@@ -229,6 +263,7 @@ function Message() {
                         ? "border px-2 rounded-xl w-1/2 p-2 break-all mb-2 bg-gradient-to-r from-pink-400 to-purple-500"
                         : "text-gray-50 border px-2 rounded-xl ml-auto w-1/2 bg-gradient-to-r from-purple-400 to-pink-500 p-2 break-all mb-2 "
                     }`}
+                    key={index}
                   >
                     <p>{curr.message}</p>
                     <span>{curr.time}</span>
@@ -247,6 +282,8 @@ function Message() {
               placeholder="Write a messsage"
               value={message}
               onChange={getMessagesValues}
+              onKeyUp={()=>(socket.emit('typing',(room)))}
+          
             />
             {console.log("ddd", send) || send ? (
               <>

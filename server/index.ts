@@ -29,6 +29,11 @@ io.on("connection", (socket: any) => {
     socket.join(data);
     console.log(`User with ID: ${socket.id} joined room: ${data}`);
   });
+  socket.on('typing', (room:any) => {
+    // socket.to(room).emit("typing",room);
+    // socket.broadcast.emit('typing');
+    socket.broadcast.emit('typing', room)
+  });
 
   socket.on("ping", (data: any) => {
     console.log("data", data);

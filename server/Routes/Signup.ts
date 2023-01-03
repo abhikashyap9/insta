@@ -9,6 +9,7 @@ import Profile from "../Schemas/Profile";
 import userAuthentication from "../middeware/jwtauthorization";
 import { ReqAuthType, UserType } from "../types/userType";
 
+
 signrouter.post("/signup", async (req: Request, res: Response) => {
   const { email, fullName, userName, password } = req.body;
   console.log("reqBody", req.body);
@@ -82,17 +83,13 @@ const getTokenFrom = (request: Request) => {
   return null;
 };
 
-signrouter.get("/userprofile/i", async (req: Request, res: Response) => {
-  const token = getTokenFrom(req);
-  const decodedToken = jwt.verify(token!, process.env.SECRET!) as UserType;
-  console.log(token)
+signrouter.get("/userprofile/i", userAuthentication,async (req: Request, res: Response) => {
 
-  if (!decodedToken.id) {
-    return res.status(401).json({ error: "token missing or invalid token" });
-  }
+  let decodedToken = req["auth"]?.userId;
+  console.log('decoded',decodedToken)
 
   try {
-    let user = await Signupuser.findById(decodedToken.id);
+    let user = await Signupuser.findById(decodedToken);
     console.log('user',user);
     if(user){
       return res.status(200).json(user).end()
