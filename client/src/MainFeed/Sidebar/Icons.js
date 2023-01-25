@@ -21,11 +21,11 @@ function Icons(props) {
 
   const isDesktopResolution = useMatchMedia("(min-width:992px)", true);
 
-  const {  icon, iconinfo ,link } = props;
+  const {  icon, iconinfo ,link,click } = props;
   
   return (
     <>
-      <Link to={link}>       
+      <Link to={link} onClick={click}>       
         <Container >
         <IconContainer>{icon}</IconContainer>
         <IconInfo>{isDesktopResolution && (iconinfo)}</IconInfo>

@@ -18,7 +18,7 @@ import OtherProfile from './MainFeed/Profile/OtherProfile';
 
 
 function App() {
-  
+
   return (
 
     <>
@@ -41,6 +41,7 @@ function App() {
               <Route path="addimages" element={<AddImages />} />
               <Route path="notification" element={<Notification />} />
               <Route path="message/:id" element={<Message/>} />
+              <Route path="message" element={<Message/>} />
                   
               </Route>
               <Route>

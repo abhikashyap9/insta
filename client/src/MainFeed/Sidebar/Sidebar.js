@@ -54,7 +54,7 @@ xs:justify-around
 `
 function Sidebar(props) { 
 
-  // const {home,searchComponent,messages,favIcon,addIcon}=props;
+  const {home,search,message,notification,addimages}=props;
   
   
   return (
@@ -62,9 +62,11 @@ function Sidebar(props) {
          
           <Icons 
           // tab={home}
+          click={home}
           icon={<HomeIcon style={{ fontSize: 24 }}/>}
           iconinfo="Feed"
           link={`/`}
+          
           />
          
           <Icons
@@ -72,6 +74,7 @@ function Sidebar(props) {
            icon={<SearchIcon style={{ fontSize: 24 }}/>}
            iconinfo="Discover"
            link={`explore`}
+           onClick={search}
            /> 
 
         <Icons
@@ -79,6 +82,7 @@ function Sidebar(props) {
            icon={<MessageIcon style={{ fontSize:24 }}/>}
            iconinfo="Messages"
            link={`message`}
+           onClick={message}
            />  
            
            <Icons
@@ -86,6 +90,7 @@ function Sidebar(props) {
            icon={<FavoriteBorderIcon style={{ fontSize:24 }}/>}
            iconinfo="Notifications"
            link={`notification`}
+           onClick={notification}
            /> 
 
            <Icons
@@ -93,6 +98,7 @@ function Sidebar(props) {
            icon={<AddBoxIcon style={{ fontSize:24 }}/>}
            iconinfo="Create"
            link={`addimages`}
+           onClick={addimages}
            />   
           
           

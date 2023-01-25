@@ -93,7 +93,7 @@ useruploadsrouter.put('/likedby/:id', userAuthentication, async (req: RequestAut
 	let userId = req['auth']?.userId
 	console.log(userId)
 	try {
-		let post = await UserUploads.findByIdAndUpdate(id, { likedBy: userId }, { new: true })
+		let post = await UserUploads.findByIdAndUpdate(id, {$push: {likedBy: userId} }, { new: true })
 		res.status(201).json(post).end()
 	} catch (err) {
 		res.status(400).json({ error: err })

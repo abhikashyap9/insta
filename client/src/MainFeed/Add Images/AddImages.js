@@ -5,6 +5,7 @@ import CropOption from './CropOption';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AddPost from "../../services/addpost.service";
 import { Country, State, City } from 'country-state-city';
+import { useSelector, useDispatch } from 'react-redux'
 let CountryName = Country.getAllCountries()
 const StateName = State.getAllStates()
 
@@ -84,7 +85,7 @@ function AddImages(props) {
     console.log(imagesFiles[0])
    
   }
-
+ 
   return (
     <div className="border border-gray-200 rounded-lg bg-white lg:w-full xs:w-full sm:w-full mt-5" onClick={addImage}>
       <Header

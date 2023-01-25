@@ -20,20 +20,20 @@ const Signupuser = new mongoose.Schema({
 		type: String,
 		minLength: 8,
 		required: true,
-		//  select:false
+		
 	},
 	following: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
 			ref: 'signupuser',
-			// select:false
+			
 		},
 	],
 	followers: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
 			ref: 'signupuser',
-			// select:false
+		
 		},
 	],
 	profilePicture: [{

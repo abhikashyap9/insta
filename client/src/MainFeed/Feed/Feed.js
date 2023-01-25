@@ -92,7 +92,8 @@ function Feed(props) {
 
   return (
 
-    <div>
+    <div className='lg:w-4/5 sm:w-full flex justify-between'>
+    <div className='lg:basis-3/5 sm:w-full'>
       <Stories />
       {
         userPost.map((current, index) => {
@@ -120,8 +121,8 @@ function Feed(props) {
           )
         })
       }
-
-      <div className="lg:basis-1/5 md:basis-0 xs:basis-0 sm:basis-0">
+      </div>  
+      <div >
         {isDesktopResolution && <Footer />}
       </div>
     </div>
