@@ -4,6 +4,9 @@ import config from "./utils/config";
 import logger from "./utils/logger";
 import initMongodb from "./utils/initMongodb";
 const server = http.createServer(app);
+var ip = process.env.IP || '10.0.0.204',
+    port = process.env.PORT || 3000;
+
 import { Server } from "socket.io";
 
 const io = new Server(server, {
@@ -17,7 +20,7 @@ console.log("ax", server);
 async function main() {
   await initMongodb.connect();
 
-  server.listen(config.PORT, () => {
+  server.listen(port,ip, () => {
     logger.info(`Server rununing on port ${config.PORT}`);
   });
 }
@@ -30,10 +33,32 @@ io.on("connection", (socket: any) => {
     console.log(`User with ID: ${socket.id} joined room: ${data}`);
   });
   socket.on('typing', (room:any) => {
-    // socket.to(room).emit("typing",room);
-    // socket.broadcast.emit('typing');
-    socket.broadcast.emit('typing', room)
+    socket.to(room).emit("typing",room);
+    console.log('typing')
   });
+  socket.on('stoptyping', (room:any) => {
+    socket.to(room).emit("stoptyping",room);
+    console.log('stoptyping');
+  });
+
+  console.log(socket.id)
+  
+  socket.emit('connection-success',{
+    status:'connection-success',
+    socketId:socket.id
+  })
+
+  // socket.on('disconnect',()=>{
+  //    console.log(`${socket.id} has disconnected`)
+  // })
+  socket.on('sdp',(data:any)=>{
+    console.log(data)
+    socket.broadcast.emit('sdp',data)
+  })
+
+  socket.on('candidate',(data:any)=>{
+    socket.broadcast.emit('candidate',data)
+  })
 
   socket.on("ping", (data: any) => {
     console.log("data", data);
@@ -43,9 +68,10 @@ io.on("connection", (socket: any) => {
 
   socket.on("disconnect", () => {
     console.log("User Disconnected", socket.id);
+    socket.broadcast.emit("callEnded")
   });
 });
-
+console.log(config.PORT)
 // const server = http.createServer(app)
 
 // mongodb+srv://abhishek:<password>@insta.bpmz0tv.mongodb.net/?retryWrites=true&w=majority
