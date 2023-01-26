@@ -4,8 +4,6 @@ import config from "./utils/config";
 import logger from "./utils/logger";
 import initMongodb from "./utils/initMongodb";
 const server = http.createServer(app);
-var ip = process.env.IP || '10.0.0.204',
-    port = process.env.PORT || 3000;
 
 import { Server } from "socket.io";
 
@@ -20,7 +18,7 @@ console.log("ax", server);
 async function main() {
   await initMongodb.connect();
 
-  server.listen(port,ip, () => {
+  server.listen(config.PORT, () => {
     logger.info(`Server rununing on port ${config.PORT}`);
   });
 }
