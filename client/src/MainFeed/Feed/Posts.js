@@ -5,7 +5,7 @@ import IosShareIcon from '@mui/icons-material/IosShare';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
-
+import DummyPic from '../../image/dumyPic.svg.png'
 import Feedoption from './Feedoption.js';
 import tw from 'tailwind-styled-components'
 import { Link } from 'react-router-dom';
@@ -120,7 +120,7 @@ function Posts(props) {
       <CommentsContainer> 
         <CommentImages>
         <img 
-            src={`http://localhost:3001/${currentUserProfileImage}`}
+            src={`${currentUserProfileImage ? `http://localhost:3001/${currentUserProfileImage}`:DummyPic}`}
             alt="profile" 
             load="lazy" 
             className="inline-block h-8 w-8 rounded-full ring-2 ring-white"    
