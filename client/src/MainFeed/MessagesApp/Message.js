@@ -11,8 +11,12 @@ import io from "socket.io-client";
 import { useParams } from "react-router-dom";
 import UserProfile from "../../services/userProfile.service";
 import Messages from "../../services/message.service";
+import DummyPic from '../../image/dumyPic.svg.png'
 import { useSelector, useDispatch } from 'react-redux'
 
+// import instant from '../src/image/instant.svg';
+
+// console.log(instant)
 
 const socket = io.connect("http://localhost:3001");
 console.log(socket);
@@ -34,13 +38,18 @@ function Message() {
   const [lastPong, setLastPong] = useState(null);
   const [message, setMessage] = useState("");
   const [user, setUser] = useState({ profilePic: "", name: "" });
-  const [room, setRoom] = useState([]);
+  const [room, setRoom] = useState(null);
   const [showMessages, setShowMessages] = useState([]);
   const [currentUser, setCurrentUser] = useState([]);
   const [savedMessages, setSavedMessages] = useState([]);
   const [chatList, setChatList] = useState([]);
+  const [typing,setTyping]=useState(false);
 
   const { id } = useParams();
+
+  
+  
+
 
   let auth = localStorage.getItem("token");
   useEffect(() => {
@@ -81,34 +90,21 @@ function Message() {
       setChatList(userChat);
     });
   }, []);
-
+  
   console.log('ChatList',chatList)
-  console.log('show',showMessages)
+  console.log('show',showMessages) 
 
 
-
-  // useEffect(() => {
-
-  //   setTimeout(() => {
-  //     console.log(room)
-  //     Messages.getMessages(room).then((res) => {
-  //       console.log(res)
-  //     });
-  //   }, 1000);
-
-  // }, []);
-
-  // console.log(user)
 
   useEffect(() => {
     socket.on("connect", () => {
       setIsConnected(true);
     });
-
+    
     socket.on("disconnect", () => {
       setIsConnected(false);
     });
-
+    
     socket.on("pong", () => {
       setLastPong(new Date().toISOString());
     });
@@ -118,21 +114,19 @@ function Message() {
       socket.off("pong");
     };
   }, [socket]);
-
- 
-
+  
+  
+  
   const getMessagesValues = (e) => {
     let messageValue = e.target.value;
-    
     setMessage(messageValue);
-
     if (messageValue.length >= 1) {
       setSend(true);
     } else {
       setSend(false);
     }
   };
-
+  
   const sendPing = async () => {
     
     const messageData = {
@@ -140,9 +134,9 @@ function Message() {
       message: message,
       author: currentUser,
       time:
-        new Date(Date.now()).getHours() +
-        ":" +
-        new Date(Date.now()).getMinutes(),
+      new Date(Date.now()).getHours() +
+      ":" +
+      new Date(Date.now()).getMinutes(),
     };
     await socket.emit("ping", messageData);
     setShowMessages((list) => [...list, messageData]);
@@ -150,7 +144,7 @@ function Message() {
     let data = {
       messageData: messageData,
     };
-
+    
     Messages.savedMessages(room, auth, data).then((res) => {
       
       console.log(res);
@@ -170,8 +164,8 @@ function Message() {
   const setChat=(id)=>{
    console.log(id)
    Messages.getRoom(id, auth).then((res) => {
-    let data=res.data
-    socket.emit("join_room", data[0].id);
+     let data=res.data
+     socket.emit("join_room", data[0].id);
     let room = data[0].id;
     setRoom(room);
     let messages = data[0].messages;
@@ -181,26 +175,42 @@ function Message() {
 let messangerId=Object.keys(data[0].chatMembers[0].messangerId).length
 
 if(userId>messangerId){
-    console.log(data[0].chatMembers[0].messangerId);
+    
     let profileImage=data[0].chatMembers[0].messangerId.profilePicture[0]
     let name=data[0].chatMembers[0].messangerId.userName
     setUser({ ...user, profilePic: profileImage, name: name });
 }else{
-    console.log(data[0].chatMembers[0].userId)
+  
     let profileImage=data[0].chatMembers[0].userId.profilePicture[0];
     let name=data[0].chatMembers[0].userId.userName
     setUser({ ...user, profilePic: profileImage, name: name })
 }
   });
   }
- 
-  socket.on('typing', (room) => {
-    console.log(` ${room} is typing...`);
-  });
-
   
+  socket.on('typing', (room)=> {
+    setTyping(true)
+  });
+  socket.on('stoptyping', (room)=> {
+      setTyping(false)   
+  });
+ 
+  
+
+  console.log('Roooommmmm',room)
+  
+  
+
+  // const callPeer = () => {
+  //   const call = peer.call(remoteId, localStream);
+  //   call.on('stream', (remoteStream) => {
+  //     setRemoteStream(remoteStream)
+  //   })
+
+  // };
   return (
     <div className="lg:w-4/5 md:w-full sm:w-full">
+    
       <div className="messages_container  flex border border-gray-200 bg-white  m-6">
         <LeftItems>
           <Header>
@@ -212,7 +222,7 @@ if(userId>messangerId){
               <ImageContainer className="">
                 <img
                   className="inline-block h-12 w-12 rounded-full ring-2 ring-white"
-                  src={`${curr.profilePicture.length>0? `http://localhost:3001/${curr?.profilePicture[0]}`:'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'}`}
+                  src={`${curr.profilePicture.length>0 ? `http://localhost:3001/${curr?.profilePicture[0]}`:DummyPic}`}
                   alt="image"
                 />
               </ImageContainer>
@@ -226,7 +236,7 @@ if(userId>messangerId){
         </LeftItems>
        
         <RightItems>
-          <div className="border-b flex items-center justify-between px-2 h-14 ">
+         {room ? <> <div className="border-b flex items-center justify-between px-2 h-14 ">
             <MessageInfo>
               <ImageContainer className="">
                 <img
@@ -270,19 +280,21 @@ if(userId>messangerId){
                   </div>
                 );
               })}
+              {typing && <p className='messages_typing'>typing....</p>}
             {/* <RecievedMessage
                         showMessages={showMessages}/>  */}
           </div>
          
          <div className="absolute bottom-0 w-full py-2 px-3">
-          <div className="flex rounded-md border border-gray-200 bg-gray-100 py-2">
+          <div className="flex rounded-md border border-gray-200 bg-gray-100 py-2 ">
             <input
               type="text"
               className="outline-none border-none w-full bg-transparent text-sm pl-2"
               placeholder="Write a messsage"
               value={message}
               onChange={getMessagesValues}
-              onKeyUp={()=>(socket.emit('typing',(room)))}
+              onKeyDown={()=>(socket.emit('typing',(room)))}
+              onKeyUp={()=>(socket.emit('stoptyping',(room)))}
           
             />
             {console.log("ddd", send) || send ? (
@@ -300,7 +312,28 @@ if(userId>messangerId){
               </>
             )}
           </div>
-          </div>
+          </div></>:<>
+            <div className='flex flex-col text-center m-0 absolute top-1/3 empty_message'>
+              <div className="mb-1.5">
+                {/* <img src={} alt='Icon'/>
+                 */}
+                 <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120.47 122.88" className='w-20 inline'>
+<defs>
+{/* <style>.cls-1{fill-rule:evenodd}
+</style> */}
+</defs>
+<title>instant-response</title>
+<path class="cls-1"
+ d="M17.2,0H79.49a17.24,17.24,0,0,1,17.2,17.2V55.55a17.24,17.24,0,0,1-17.2,17.2H46.92L20.81,95.2A2.9,2.9,0,0,1,16,93c0-.07,0-.15,0-.22l1.39-20.07H17.2A17.24,17.24,0,0,1,0,55.55V17.2A17.24,17.24,0,0,1,17.2,0ZM45.27,40.55l-11.78-1.1L45.56,15.76H58.91L49,30.33l13.62,1.51-25,30,7.61-21.3ZM106.79,28a16.91,16.91,0,0,1,13.68,16.55V82.88a16.88,16.88,0,0,1-16.85,16.85H103l1.42,20.45h0a.86.86,0,0,1,0,.16,2.54,2.54,0,0,1-2.54,2.54,2.51,2.51,0,0,1-1.65-.61L74,99.07H39.49l17-17.3h36a14.34,14.34,0,0,0,14.3-14.3V28ZM79.48,5.8H17.2A11.43,11.43,0,0,0,5.8,17.2V55.55h0A11.44,11.44,0,0,0,17.2,67h3.53a2.91,2.91,0,0,1,2.7,2.9c0,.06,0,.12,0,.18L22.29,86.31,43.83,67.79a2.88,2.88,0,0,1,2-.84H79.48a11.43,11.43,0,0,0,11.4-11.4V17.2A11.43,11.43,0,0,0,79.48,5.8Z"/>
+</svg>
+              </div>
+              <div className="font-normal ... text-2xl mb-1.5"><h1>Your Messages</h1></div>
+              <div className="mb-2.5 text-gray-400"><p>Send private photos and messages to a friend or group.</p></div>
+              <div><button class="bg-sky-500 text-white py-1 px-2 rounded-md">Send Messages</button></div>
+            </div>
+          </> 
+
+         }
         </RightItems>
       </div>
     </div>

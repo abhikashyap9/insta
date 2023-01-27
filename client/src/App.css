@@ -150,3 +150,27 @@ input.form-control {
 .messages_container{
   height:80vh;
 }
+.empty_message{
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+  left: 50%;
+  width: 100%;
+  transform: translateX(-50%)
+}
+.messages_typing{
+  animation: 0.8s ease-in 0s 1 message;
+  opacity:0.8;
+  font-size:12px;
+  margin-left:4px;
+}
+@keyframes message{
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+ 
+100% {
+  /* visibility: hidden; */
+  transform: translate3d(1%, 0, 0);
+  opacity:1;
+}
+}

@@ -79,9 +79,12 @@ function AddImages(props) {
    formData.append("caption",captionValue)
    formData.append("location",formValue)
 
-    AddPost.addSinglePost(formData,auth).then((res)=>{
-        
+    if(rightCaption==='share')
+    {
+      AddPost.addSinglePost(formData,auth).then((res)=>{
+            
     })
+  }
     console.log(imagesFiles[0])
    
   }

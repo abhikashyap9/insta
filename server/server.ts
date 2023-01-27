@@ -69,7 +69,7 @@ io.on("connection", (socket: any) => {
     socket.broadcast.emit("callEnded")
   });
 });
-console.log(config.PORT)
+
 // const server = http.createServer(app)
 
 // mongodb+srv://abhishek:<password>@insta.bpmz0tv.mongodb.net/?retryWrites=true&w=majority
