@@ -30,7 +30,7 @@
     "react-scripts": "5.0.1",
     "react-search-autocomplete": "^8.1.0",
     "react-slick": "^0.29.0",
-    "react-slideshow-image": "^4.0.5",
+    "react-slideshow-image": "^4.2.0",
     "simple-peer": "^9.11.1",
     "slick-carousel": "^1.8.1",
     "socket.io-client": "^4.5.4",
