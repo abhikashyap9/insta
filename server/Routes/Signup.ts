@@ -86,10 +86,10 @@ const getTokenFrom = (request: Request) => {
 signrouter.get("/userprofile/i", userAuthentication,async (req: Request, res: Response) => {
 
   let decodedToken = req["auth"]?.userId;
-  console.log('decoded',decodedToken)
 
   try {
     let user = await Signupuser.findById(decodedToken);
+    
     console.log('user',user);
     if(user){
       return res.status(200).json(user).end()
@@ -103,7 +103,7 @@ signrouter.get("/userprofile/i", userAuthentication,async (req: Request, res: Re
 
 signrouter.get(
   "/otherprofile/:id",
-  async (req: Request, res: Response, next) => {
+  async (req: Request, res: Response) => {
     const { id } = req.params;
     console.log("id", id);
     try {
@@ -112,7 +112,7 @@ signrouter.get(
     } catch (err) {
       res.status(400).json({ error: err });
     }
-    next();
+    
   }
 );
 

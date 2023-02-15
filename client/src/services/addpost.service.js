@@ -55,6 +55,7 @@ const addComment=(auth,postId,data)=>{
 }
 
 
+
 const AddPosts={
     addComment,addLike,addSinglePost,userUpload,addProfileImage,removeLike
 }

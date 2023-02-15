@@ -5,6 +5,7 @@ import './index.css';
 import App from './App';
 // import reportWebVitals from './reportWebVitals'
 import {store} from './features/counter/AddDifferentSizes'
+import * as serviceWorker from './serviceWorker';
 import { Provider } from 'react-redux'
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -18,4 +19,5 @@ root.render(
  
  
 );
+serviceWorker.unregister();
 

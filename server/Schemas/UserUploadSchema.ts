@@ -31,6 +31,10 @@ const UserUploads = new mongoose.Schema({
 			postedBy: {type: mongoose.Schema.Types.ObjectId, ref: 'signupuser'},
 		},
 	],
+	createdAt: {
+        type: Date,
+        default: Date.now()
+    },
 })
 // [899811,[comment]]
 UserUploads.set('toJSON', {

@@ -8,9 +8,9 @@ const requestLogger = (req: any, res: any, next: any) => {
 	next()
 }
 
-const unknownendPoints = (request: any, response: any, next: any) => {
-	response.status(404).send({error: 'unknown endpoints'})
-}
+// const unknownendPoints = (request: any, response: any, next: any) => {
+// 	response.status(404).send({error: 'unknown endpoints'})
+// }
 
 const errorHandler = (error: any, request: any, response: any, next: any) => {
 	if (error.name === 'CastError') {
@@ -27,4 +27,4 @@ const errorHandler = (error: any, request: any, response: any, next: any) => {
 	// }
 	next(error)
 }
-export default {errorHandler, unknownendPoints, requestLogger}
+export default {errorHandler, requestLogger}

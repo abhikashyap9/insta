@@ -37,6 +37,7 @@ const SignupForm = () => {
     },
     validate,
     onSubmit: values => { 
+      console.log(values)
       Auth.login(values).then((res)=>{
         
          if(res.status===200){

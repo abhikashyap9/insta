@@ -43,7 +43,7 @@ function Posts(props) {
         <HeaderItemsContainer>
           <ImagesContainer onClick={userProfile}>
             <img 
-             src={`http://localhost:3001/${postProfile}`} 
+             src={`https://instaserver-26it.onrender.com/${postProfile}`} 
              alt="stories" 
              loading="lazy" 
              className="inline-block h-8 w-8 rounded-full ring-2 ring-white object-cover"
@@ -105,7 +105,7 @@ function Posts(props) {
         <div className='flex items-center ml-2'>
         <ImagesContainer>
             <img className="inline-block h-8 w-8 rounded-full ring-2 ring-white"
-             src={`http://localhost:3001/${comp?.postedBy?.profilePicture[0]}`}
+             src={`https://instaserver-26it.onrender.com//${comp?.postedBy?.profilePicture[0]}`}
              alt="stories" 
              loading="lazy" />
           </ImagesContainer>
@@ -120,7 +120,7 @@ function Posts(props) {
       <CommentsContainer> 
         <CommentImages>
         <img 
-            src={`${currentUserProfileImage ? `http://localhost:3001/${currentUserProfileImage}`:DummyPic}`}
+            src={`${currentUserProfileImage ? `https://instaserver-26it.onrender.com/${currentUserProfileImage}`:DummyPic}`}
             alt="profile" 
             load="lazy" 
             className="inline-block h-8 w-8 rounded-full ring-2 ring-white"    
