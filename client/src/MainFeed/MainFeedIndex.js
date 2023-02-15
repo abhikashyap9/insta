@@ -21,6 +21,7 @@ import UserProfile from '../services/userProfile.service';
 import { useSelector, useDispatch } from 'react-redux'
 import {actions} from '../features/counter/AddDifferentSizes.js';
 import { QrCodeScannerOutlined } from '@mui/icons-material';
+import { useNavigate } from "react-router-dom";
 function MainFeedIndex() {
 
   const isDesktopResolution = useMatchMedia("(min-width:1024px)", true);
@@ -40,20 +41,13 @@ function MainFeedIndex() {
 
 
 const location = useLocation()
-
-
-let x=()=>{
-
-  setChange(Math.random()*5)
-}
-console.log(change)
-
+const navigate = useNavigate();
 useEffect(()=>{
   // console.log(location);
      if(location.pathname === '/'){
        setSize({...size,
         sidebar:'lg:basis-1/4',
-        mainScreen:'sm:basis-1/2 lg:basis-9/12	 md:basis-2/5 xs:basis-full top w-s'})
+        mainScreen:'sm:basis-1/2 lg:basis-9/12 md:basis-2/5 xs:basis-full top w-s'})
         document.body.style.overflowY = "";
        
      }
@@ -67,13 +61,17 @@ useEffect(()=>{
       setSize(0) 
      }
      else if(location.pathname.slice(0,8) === '/message'){
-      
+     console.log('Auth',auth)
+      if(!auth){
+        navigate("/Signup")
+        console.log(location.pathname)
+      }
       setSize({...size,
         sidebar:'lg:basis-1/5',
         mainScreen:'sm:basis-1/2 lg:basis-4/5	 md:basis-2/5 xs:basis-full top w-s'})
         document.body.style.overflowY = "hidden";
      }
-},[change])
+},[location.pathname])
  
  
 console.log(size.sidebar,size.mainScreen)
@@ -97,13 +95,13 @@ console.log(size.sidebar,size.mainScreen)
       <div className='flex lg:justify-between md:justify-center sm:justify-center xs:justify-center'>
 
         {isDesktopResolution &&
-          <div className={size.sidebar} onClick={x}>
+          <div className={size.sidebar}>
             <Sidebar/>
           </div>
         }
 
         {
-          !isDesktopResolution && <div className={size.sidebar} onClick={x}>
+          !isDesktopResolution && <div className={size.sidebar}>
             <Sidebar/> </div>
         }
         {/* sm:basis-1/2 lg:basis-2/5 md:basis-2/5 xs:basis-full top w-s */}

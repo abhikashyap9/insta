@@ -18,7 +18,7 @@ import { useSelector, useDispatch } from 'react-redux'
 
 // console.log(instant)
 
-const socket = io.connect("http://localhost:3001");
+const socket = io.connect('https://instaserver-26it.onrender.com');
 console.log(socket);
 
 // import {animate__slideOutRight} from 'react-animations/lib/animate__slideOutRight'
@@ -222,7 +222,7 @@ if(userId>messangerId){
               <ImageContainer className="">
                 <img
                   className="inline-block h-12 w-12 rounded-full ring-2 ring-white"
-                  src={`${curr.profilePicture.length>0 ? `http://localhost:3001/${curr?.profilePicture[0]}`:DummyPic}`}
+                  src={`${curr.profilePicture.length>0 ? `https://instaserver-26it.onrender.com/${curr?.profilePicture[0]}`:DummyPic}`}
                   alt="image"
                 />
               </ImageContainer>
@@ -241,7 +241,7 @@ if(userId>messangerId){
               <ImageContainer className="">
                 <img
                   className="inline-block h-8 w-8 rounded-full ring-2 ring-white"
-                  src={`http://localhost:3001/${user.profilePic}`}
+                  src={`https://instaserver-26it.onrender.com/${user.profilePic}`}
                   alt="image"
                 />
               </ImageContainer>

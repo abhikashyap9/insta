@@ -11,7 +11,7 @@ import Notification from '../src/MainFeed/Notification/Notification.js';
 import Message from '../src/MainFeed/MessagesApp/Message';
 import Feed from './MainFeed/Feed/Feed';
 import OtherProfile from './MainFeed/Profile/OtherProfile';
-
+import CropOption from './CropOption'
 // import Notification from '../src/MainFeed/Notification/Notification';
 // import { Explore } from '@material-ui/icons';
 // import AddImages from './MainFeed/Add Images/AddImages';
@@ -34,9 +34,11 @@ function App() {
       <Route path="/Signup" element={<Signup/> } /> 
       <Route path="/LoginAuth" element={<LoginAuth />} />
             <Route path="/" element={<MainFeedIndex />} >
+
               <Route index element={<Feed />} />
               <Route exact path="profile" element={<Profile />} />
               <Route path="profile/:id" element={<OtherProfile />} />
+              <Route path='crop' element={<CropOption/>}/>
               <Route path="explore" element={<Explore />} />
               <Route path="addimages" element={<AddImages />} />
               <Route path="notification" element={<Notification />} />
