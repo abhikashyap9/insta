@@ -84,7 +84,6 @@ const getTokenFrom = (request) => {
 exports.signrouter.get("/userprofile/i", jwtauthorization_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     let decodedToken = (_a = req["auth"]) === null || _a === void 0 ? void 0 : _a.userId;
-    console.log('decoded', decodedToken);
     try {
         let user = yield Signupschema_1.default.findById(decodedToken);
         console.log('user', user);
@@ -97,7 +96,7 @@ exports.signrouter.get("/userprofile/i", jwtauthorization_1.default, (req, res) 
         res.status(400).json({ err: err });
     }
 }));
-exports.signrouter.get("/otherprofile/:id", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+exports.signrouter.get("/otherprofile/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     console.log("id", id);
     try {
@@ -107,7 +106,6 @@ exports.signrouter.get("/otherprofile/:id", (req, res, next) => __awaiter(void 0
     catch (err) {
         res.status(400).json({ error: err });
     }
-    next();
 }));
 exports.signrouter.put("/follow/:id", jwtauthorization_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _b;

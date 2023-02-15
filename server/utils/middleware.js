@@ -11,9 +11,9 @@ const requestLogger = (req, res, next) => {
     logger_1.default.info('....');
     next();
 };
-const unknownendPoints = (request, response, next) => {
-    response.status(404).send({ error: 'unknown endpoints' });
-};
+// const unknownendPoints = (request: any, response: any, next: any) => {
+// 	response.status(404).send({error: 'unknown endpoints'})
+// }
 const errorHandler = (error, request, response, next) => {
     if (error.name === 'CastError') {
         return response.status(400).send({ error: 'malformatted id' });
@@ -29,4 +29,4 @@ const errorHandler = (error, request, response, next) => {
     // }
     next(error);
 };
-exports.default = { errorHandler, unknownendPoints, requestLogger };
+exports.default = { errorHandler, requestLogger };

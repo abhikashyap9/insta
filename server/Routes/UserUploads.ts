@@ -2,11 +2,14 @@ import jwt from 'jsonwebtoken'
 import express, { Request, Response } from 'express'
 import multer from 'multer'
 import UserUploads from '../Schemas/UserUploadSchema'
+import UserVideo from '../Schemas/UserVideosSchema'
+
 import userAuthentication from '../middeware/jwtauthorization'
 import { UserType } from '../types/userType'
 const useruploadsrouter = express.Router({
 	strict: true,
 })
+
 // const Profile =require('../Schemas/Signupschema')
 
 const fileStorageEngine = multer.diskStorage({
@@ -135,5 +138,6 @@ useruploadsrouter.put('/addcomment/:id', userAuthentication, async (req: Request
 		res.status(400).json({ error: err })
 	}
 })
+
 
 export default useruploadsrouter
