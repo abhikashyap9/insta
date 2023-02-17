@@ -20,26 +20,29 @@ const Signupuser = new mongoose.Schema({
 		type: String,
 		minLength: 8,
 		required: true,
-		
 	},
 	following: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
 			ref: 'signupuser',
-			
 		},
 	],
 	followers: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
 			ref: 'signupuser',
-		
 		},
 	],
-	profilePicture: [{
-		type: String,
-		ref: 'signupuser',
-	}],
+	profilePicture: [
+		{
+			type: String,
+			ref: 'signupuser',
+		},
+	],
+	isStorie: {
+		type: Boolean,
+		// default: false,
+	},
 })
 // const UserUploads=new mongoose.Schema({
 //     userId:{

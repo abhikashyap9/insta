@@ -14,33 +14,33 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const multer_1 = __importDefault(require("multer"));
-const conditional = require('conditional-middleware');
 const UserVideosSchema_1 = __importDefault(require("../Schemas/UserVideosSchema"));
+const Signupschema_1 = __importDefault(require("../Schemas/Signupschema"));
 const EventEmitter = require('events');
 const eventEmitter = new EventEmitter();
 const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 const ffmpeg = require('fluent-ffmpeg');
 ffmpeg.setFfmpegPath(ffmpegPath);
-const cloudinary = require("cloudinary");
-const path = require("path");
+const cloudinary = require('cloudinary');
+const path = require('path');
 const videouploadrouter = express_1.default.Router({
     strict: true,
 });
 const jwtauthorization_1 = __importDefault(require("../middeware/jwtauthorization"));
-const fs = require("fs");
+const fs = require('fs');
 cloudinary.config({
-    cloud_name: "duloaclhy",
-    api_key: "667899696778733",
-    api_secret: "awaxW2o-F2QVCLMwDkDVmTtkKpA"
+    cloud_name: 'duloaclhy',
+    api_key: '667899696778733',
+    api_secret: 'awaxW2o-F2QVCLMwDkDVmTtkKpA',
 });
 const fileStorageEngine = multer_1.default.diskStorage({
     destination: (req, file, cb) => {
         console.log('files1', file);
-        if (!fs.existsSync("public")) {
-            fs.mkdirSync("public");
+        if (!fs.existsSync('public')) {
+            fs.mkdirSync('public');
         }
-        if (!fs.existsSync("public/uploads")) {
-            fs.mkdirSync("public/uploads");
+        if (!fs.existsSync('public/uploads')) {
+            fs.mkdirSync('public/uploads');
         }
         cb(null, './public/uploads');
     },
@@ -53,11 +53,11 @@ const upload = (0, multer_1.default)({
     fileFilter: function (req, file, cb) {
         console.log('files2', file);
         var ext = path.extname(file.originalname);
-        if (ext !== ".mkv" && ext !== ".mp4") {
-            return cb(new Error("Only videos are allowed!"));
+        if (ext !== '.mkv' && ext !== '.mp4') {
+            return cb(new Error('Only videos are allowed!'));
         }
         cb(null, true);
-    }
+    },
 });
 const trimmed = (req, res, next) => {
     var _a, _b;
@@ -83,14 +83,15 @@ const trimmed = (req, res, next) => {
         .on('end', (err) => {
         console.log('finished');
         next();
-    }).saveToFile(fileSaved)
+    })
+        .saveToFile(fileSaved)
         .run();
     req.trimmed = fileSaved;
     // ,upload.single('video')
 };
 const cloudinaryMiddleware = (req, res, next) => {
     let trimmedVideo = req.trimmed;
-    cloudinary.v2.uploader.upload(trimmedVideo, { resource_type: "video" }, (error, result) => __awaiter(void 0, void 0, void 0, function* () {
+    cloudinary.v2.uploader.upload(trimmedVideo, { resource_type: 'video' }, (error, result) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             let myResult = yield result;
             console.log('myResult', myResult);
@@ -110,32 +111,32 @@ const cloudinaryMiddleware = (req, res, next) => {
 const getClodinaryUrl = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     eventEmitter.on('start', () => {
         console.log('started');
+        //
         next();
     });
 });
 videouploadrouter.post('/singleVideo', jwtauthorization_1.default, upload.single('video'), trimmed, cloudinaryMiddleware, getClodinaryUrl, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
+    const userId = (_a = req['auth']) === null || _a === void 0 ? void 0 : _a.userId;
     let trimmedVideo = req.cloudinaryMiddleware;
     console.log('three', trimmedVideo.url);
     const uservideos = new UserVideosSchema_1.default({
-        userId: (_a = req['auth']) === null || _a === void 0 ? void 0 : _a.userId,
-        video: trimmedVideo.url,
+        userId: userId,
+        video: [trimmedVideo.url],
     });
     try {
-        const video = yield uservideos.save();
-        console.log(video);
-        return res.status(201).json([video]);
-        //
+        let savedVideos = yield uservideos.save();
+        let storiesAdd = yield Signupschema_1.default.findByIdAndUpdate(userId, {
+            isStorie: true,
+        }, { new: true });
+        console.log(storiesAdd, savedVideos);
+        res.status(201);
     }
-    catch (err) {
-        console.log(err.code === 'ERR_HTTP_HEADERS_SENT');
-        console.log(err);
-        // return res.status(400).json({ err })
-    }
+    catch (err) { }
 }));
 // videouploadrouter.post('/singleImage',userAuthentication,upload.single('image'),async (req:any, res:any) => {
 // })
 // videouploadrouter.get('/singleVideo',userAuthentication,async(req:any,res:any)=>{
-//     let uploads=await 
+//     let uploads=await
 // })
 exports.default = videouploadrouter;

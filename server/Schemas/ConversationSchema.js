@@ -11,28 +11,28 @@ const Conversation = new mongoose_1.default.Schema({
         userId: {
             type: mongoose_1.default.Schema.Types.ObjectId,
             ref: 'signupuser',
-            autopopulate: true
+            autopopulate: true,
         },
         messangerId: {
             type: mongoose_1.default.Schema.Types.ObjectId,
             ref: 'signupuser',
-            autopopulate: true
-        }
+            autopopulate: true,
+        },
     },
     createdBy: {
         type: String,
     },
     messages: {
         type: Array,
-        ref: "conversation",
+        ref: 'conversation',
     },
 });
 Conversation.plugin(mongoose_autopopulate_1.default);
-Conversation.set("toJSON", {
+Conversation.set('toJSON', {
     transform: (document, returnedObject) => {
         returnedObject.id = returnedObject._id.toString();
         delete returnedObject._id;
         delete returnedObject._vs;
     },
 });
-exports.default = mongoose_1.default.model("conversation", Conversation);
+exports.default = mongoose_1.default.model('conversation', Conversation);
