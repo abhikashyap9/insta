@@ -14,6 +14,7 @@ const videouploadrouter = express.Router({
 	strict: true,
 })
 import userAuthentication from '../middeware/jwtauthorization'
+import {head} from 'superagent'
 const fs = require('fs')
 
 cloudinary.config({
@@ -146,6 +147,92 @@ videouploadrouter.post(
 				{new: true}
 			)
 			console.log(storiesAdd, savedVideos)
+			res.status(201)
+		} catch (err) {}
+	}
+)
+
+videouploadrouter.get('/getAllStories', userAuthentication, async (req: any, res: any) => {
+	const userId = req['auth']?.userId
+
+	let gettingVideos = await UserVideos.find({userId: userId}).populate('userId', 'userName')
+	console.log(gettingVideos)
+
+	try {
+		return res.status(201).json(gettingVideos)
+	} catch (err) {
+		return res.status(400).json({err: err})
+	}
+})
+
+videouploadrouter.get('/getVideo/:id', async (req, res) => {
+	const videoPath = ``
+	const videoStat = fs.statSync(videoPath)
+	const fileSize = videoStat.fileSize
+	const videoRange = req.headers.range
+
+	if (videoRange) {
+		const parts = videoRange.replace(/bytes=/, '').split('-')
+
+		const start = parseInt(parts[0], 10)
+
+		const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1
+
+		const chunksize = end - start + 1
+
+		const file = fs.createReadStream(videoPath, {start, end})
+
+		const header = {
+			'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+
+			'Accept-Ranges': 'bytes',
+
+			'Content-Length': chunksize,
+
+			'Content-Type': 'video/mp4',
+		}
+
+		res.writeHead(206, header)
+
+		file.pipe(res)
+	} else {
+		const head = {
+			'Content-Length': fileSize,
+
+			'Content-Type': 'video/mp4',
+		}
+
+		res.writeHead(200, head)
+
+		fs.createReadStream(videoPath).pipe(res)
+	}
+})
+
+videouploadrouter.put(
+	'/singleVideo',
+	userAuthentication,
+	upload.single('video'),
+	trimmed,
+	cloudinaryMiddleware,
+	getClodinaryUrl,
+	async (req: any, res: any) => {
+		const userId = req['auth']?.userId
+		let trimmedVideo = req.cloudinaryMiddleware
+		console.log('three', trimmedVideo.url)
+
+		const uservideos = new UserVideos({
+			userId: userId,
+			video: [trimmedVideo.url],
+		})
+
+		try {
+			// let savedVideos = await uservideos.save()
+			let storiesAdd = await uservideos.findByIdAndUpdate(userId, {
+				$push: {
+					video: trimmedVideo.url,
+				},
+			})
+			console.log(storiesAdd)
 			res.status(201)
 		} catch (err) {}
 	}

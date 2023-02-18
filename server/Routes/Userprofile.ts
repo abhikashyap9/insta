@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express'
+import express, {Request, Response} from 'express'
 import UserProfilePicture from '../Schemas/UserProfilePictureSchema'
 import multer from 'multer'
 import jwt from 'jsonwebtoken'
@@ -6,15 +6,15 @@ import userAuthentication from '../middeware/jwtauthorization'
 import ProfileDetails from '../Schemas/ProfileDetailSchema'
 import Profile from '../Schemas/Profile'
 import Signupuser from '../Schemas/Signupschema'
-import { UserType } from '../types/userType'
+import {UserType} from '../types/userType'
 const profilerouter = express.Router({
 	strict: true,
 })
 export interface RequestAuthType extends Request {
-	auth?: { userId?: string }
+	auth?: {userId?: string}
 }
 profilerouter.post('/userdetails', userAuthentication, async (req: RequestAuthType, res: Response) => {
-	const { bio, website, phoneNumber, gender, birthday } = req.body
+	const {bio, website, phoneNumber, gender, birthday} = req.body
 
 	let id = req['auth']?.userId
 	console.log(bio, website, phoneNumber, gender, birthday)
@@ -37,9 +37,7 @@ profilerouter.post('/userdetails', userAuthentication, async (req: RequestAuthTy
 })
 
 profilerouter.get('/otherprofiles', async (req, res) => {
-	let users = await Profile.find()
-		.populate('user')
-		.populate('userDetails')
+	let users = await Profile.find().populate('user').populate('userDetails')
 	console.log(users)
 	try {
 		res.status(200).json(users)
@@ -56,7 +54,7 @@ const fileStorageEngine = multer.diskStorage({
 		cb(null, Date.now() + '--' + file.originalname)
 	},
 })
-const upload = multer({ storage: fileStorageEngine })
+const upload = multer({storage: fileStorageEngine})
 
 const getTokenFrom = (request: Request) => {
 	const authorization = request.get('authorization')
@@ -72,26 +70,26 @@ profilerouter.put('/profileimage', upload.single('image'), async (req, res) => {
 
 	const decodedToken = jwt.verify(token!, process.env.SECRET!) as UserType
 	if (!decodedToken.id) {
-		return res.status(401).json({ error: 'token missing or invalid token' })
+		return res.status(401).json({error: 'token missing or invalid token'})
 	}
 
 	if (!req.body) {
-		return res.status(400).json({ error: 'content missing' })
+		return res.status(400).json({error: 'content missing'})
 	}
 	const userId = decodedToken.id
 
 	try {
-		let deleteProfilePicture = await Signupuser.findByIdAndUpdate(userId, { $set: { profilePicture:[] } } )
-		console.log('deletd',deleteProfilePicture)
+		let deleteProfilePicture = await Signupuser.findByIdAndUpdate(userId, {$set: {profilePicture: []}})
+		console.log('deletd', deleteProfilePicture)
 		let profileUpdate = await Signupuser.findByIdAndUpdate(
 			userId,
-			{ $push: { profilePicture: req['file']?.path } },
-			{ new: true }
+			{$push: {profilePicture: req['file']?.path}},
+			{new: true}
 		)
 		res.status(201).json(profileUpdate).end()
 	} catch (err) {
 		console.log(err)
-		res.status(400).json({ err })
+		res.status(400).json({err})
 	}
 })
 

@@ -18,12 +18,13 @@ import Carousel from "react-instagram-carousel";
 const images = [
   "https://pixlr.com/images/index/remove-bg.webp",
   "https://tinypng.com/images/social/website.jpg",
+  "http://res.cloudinary.com/duloaclhy/video/upload/v1676566791/gatupa8uosqsgpyooyxl.mp4",
   // "https://images.ctfassets.net/kdawwlsweh27/2LtummpjO849eQ83yGGiUN/b33c73279163c84b65241cdfcc1c8844/Fresh_Stock_Content.jpg",
 ];
 // import "swiper/css/navigation";
 // import "swiper/css/pagination";
 
-// init Swiper:
+// init Swiper:<div class="reactInstagramCarousel__image" style="background-image: url("https://tinypng.com/images/social/website.jpg"); background-size: cover; background-color: rgb(32, 35, 34); opacity: 1;"></div>
 // const swiper = new Swiper(".swiper", {
 //   // configure Swiper to use modules
 //   // modules: [Navigation, Pagination],
@@ -71,6 +72,7 @@ function Feed(props) {
   const [videos, setVideos] = useState("");
   const [isshowStorie, setisShowStorie] = useState(false);
   const [isStories, setIsStories] = useState(false);
+  const [allStories, setAllStories] = useState([]);
   const videoRef = useRef();
   let initialSliderValue = 0;
 
@@ -248,6 +250,8 @@ function Feed(props) {
       let data = res.data;
       let { isStorie } = data;
       if (isStorie) {
+        setIsStories(true);
+      } else {
         setIsStories(true);
       }
       let profilePicture = data.profilePicture;
@@ -472,7 +476,6 @@ function Feed(props) {
     formdata.append("video", videos);
     formdata.append("startTime", startTime);
     formdata.append("endTime", endTime);
-    console.log("isStorie", isStories);
     if (isStories) {
       Video.putVideoStorie(formdata, auth)
         .then((res) => {
@@ -498,6 +501,13 @@ function Feed(props) {
 
     // console.log(shareVideoResult)
   };
+
+  useEffect(() => {
+    Video.getStories(auth).then((res) => {
+      console.log("RESPONSE OF VIDEOS", res);
+      setAllStories(res.data);
+    });
+  }, []);
 
   const isDesktopResolution = useMatchMedia("(min-width:1024px)", true);
 
@@ -552,14 +562,42 @@ function Feed(props) {
           bodyHeight="100%"
         >
           <div style={{ width: "400px", height: "600px" }}>
-            <Carousel images={images} />
+            {/* <Carousel images={images} /> */}
+            {/* <div class="reactInstagramCarousel__image">
+              {/* <Video src="http://res.cloudinary.com/duloaclhy/video/upload/v1676566791/gatupa8uosqsgpyooyxl.mp4"></Video>
+              <video className="w-2/4 m-auto" controls>
+                <source
+                  src={""}
+                  // type={videoFileValue.type}
+                />
+              </video> */}
+            {/* </div>  */}
+
+            <div>
+              {/* <div>{name}</div> */}
+              <div>
+                {/* images */}
+                {/* <div className="geeks"></div> */}
+                <div
+                  className="progress-bar"
+                  // style="--width: 10"
+                  data-label="Loading..."
+                ></div>
+                {/* videos */}
+              </div>
+              <div></div>
+            </div>
           </div>
         </ReactDialogBox>
       )}
 
       <div className="lg:w-4/5 sm:w-full flex justify-between">
         <div className="lg:basis-3/5 sm:w-full">
-          <Stories addStories={modal} showPhoto={() => setisShowStorie(true)} />
+          <Stories
+            addStories={modal}
+            showPhoto={() => setisShowStorie(true)}
+            stories={allStories}
+          />
           {userPost.length > 0 ? (
             userPost?.map((current, index) => {
               return (
