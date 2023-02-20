@@ -6,19 +6,21 @@ const UserVideos = new mongoose.Schema({
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'signupuser',
 	},
-	video: {
-		type: String,
-		// required:[true,'Please enter a video']
-	},
+	video: [
+		{
+			type: String,
+			// required:[true,'Please enter a video']
+		},
+	],
 
-	createdAt:{
-        type:Date,
-        default:Date.now()
-    },
+	createdAt: {
+		type: Date,
+		default: Date.now(),
+	},
 })
 
 UserVideos.set('toJSON', {
-	transform: (document:any, returnedObject:any) => {
+	transform: (document: any, returnedObject: any) => {
 		returnedObject.id = returnedObject._id.toString()
 		delete returnedObject._id
 		delete returnedObject._v

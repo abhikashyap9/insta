@@ -37,10 +37,16 @@ const Signupuser = new mongoose_1.default.Schema({
             ref: 'signupuser',
         },
     ],
-    profilePicture: [{
+    profilePicture: [
+        {
             type: String,
             ref: 'signupuser',
-        }],
+        },
+    ],
+    isStorie: {
+        type: Boolean,
+        // default: false,
+    },
 });
 // const UserUploads=new mongoose.Schema({
 //     userId:{
