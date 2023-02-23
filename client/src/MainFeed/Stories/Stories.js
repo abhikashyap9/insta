@@ -1,7 +1,7 @@
 import { current } from "@reduxjs/toolkit";
 import React from "react";
 
-function Stories(props) {
+function Storiess(props) {
   const { addStories, showPhoto, stories } = props;
   console.log("SRTORIEIE", stories);
 
@@ -22,7 +22,7 @@ function Stories(props) {
         stories.map((current) => {
           return (
             <>
-              <div className="flex flex-col">
+              <div className="flex flex-col cursor-pointer">
                 <div
                   className="border-4 border-rose-800 rounded-full ... m-2"
                   onClick={showPhoto}
@@ -45,4 +45,4 @@ function Stories(props) {
   );
 }
 
-export default Stories;
+export default Storiess;

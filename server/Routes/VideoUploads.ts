@@ -69,7 +69,8 @@ const trimmed = (req: any, res: any, next: any) => {
 	let parseEndTime = Number(endTime)
 	let duration = parseEndTime - parseStartTime
 	const fileSaved = `./public/uploads/trimmed/${Date.now()} ${req['file'].originalname}`
-
+	
+	
 	ffmpeg({source: video})
 		.setStartTime(parseStartTime)
 		.duration(duration)
@@ -90,6 +91,24 @@ const trimmed = (req: any, res: any, next: any) => {
 
 	// ,upload.single('video')
 }
+const createThumbnail=async(req:any,res:any,next:any)=>{
+	let trimmedVideo = req.trimmed
+	console.log(trimmedVideo)
+	const outputPath = `./public/uploads/thumbnail/${Date.now()}/${trimmedVideo}`
+
+	ffmpeg(trimmedVideo)
+	.seekInput(1)
+	.frames(1)
+	.output(outputPath)
+	.on('end',()=>{
+		console.log(outputPath)
+	})
+	.run()
+
+  req.thumbnail=`./public/uploads/thumbnail/${trimmedVideo}`
+  next()
+}
+
 
 const cloudinaryMiddleware = (req: any, res: any, next: any) => {
 	let trimmedVideo = req.trimmed
@@ -120,33 +139,36 @@ const getClodinaryUrl = async (req: any, res: any, next: any) => {
 		next()
 	})
 }
+
+
 videouploadrouter.post(
 	'/singleVideo',
 	userAuthentication,
 	upload.single('video'),
 	trimmed,
+	createThumbnail,
 	cloudinaryMiddleware,
 	getClodinaryUrl,
 	async (req: any, res: any) => {
 		const userId = req['auth']?.userId
 		let trimmedVideo = req.cloudinaryMiddleware
 		console.log('three', trimmedVideo.url)
-
+        console.log('req.thumbnail',req.thumbnail)    
 		const uservideos = new UserVideos({
 			userId: userId,
-			video: [trimmedVideo.url],
+			storie: [{url:trimmedVideo.url,identifier:'video'}],
 		})
 
 		try {
 			let savedVideos = await uservideos.save()
-			let storiesAdd = await Signupuser.findByIdAndUpdate(
-				userId,
-				{
-					isStorie: true,
-				},
-				{new: true}
-			)
-			console.log(storiesAdd, savedVideos)
+			// let storiesAdd = await Signupuser.findByIdAndUpdate(
+			// 	userId,
+			// 	{
+			// 		isStorie: true,
+			// 	},
+			// 	{new: true}
+			// )
+			console.log( savedVideos)
 			res.status(201)
 		} catch (err) {}
 	}
@@ -155,7 +177,7 @@ videouploadrouter.post(
 videouploadrouter.get('/getAllStories', userAuthentication, async (req: any, res: any) => {
 	const userId = req['auth']?.userId
 
-	let gettingVideos = await UserVideos.find({userId: userId}).populate('userId', 'userName')
+	let gettingVideos = await UserVideos.find({}).populate('userId', 'userName')
 	console.log(gettingVideos)
 
 	try {
@@ -211,6 +233,38 @@ videouploadrouter.get('/getVideo/:id', async (req, res) => {
 videouploadrouter.put(
 	'/singleVideo',
 	userAuthentication,
+	
+	upload.single('video'),
+	trimmed,
+	
+	cloudinaryMiddleware,
+	getClodinaryUrl,
+	async (req: any, res: any) => {
+		const userId = req['auth']?.userId
+		let trimmedVideo = req.cloudinaryMiddleware
+		
+
+		const uservideos = new UserVideos({
+			userId: userId,
+			video: [trimmedVideo.url],
+		})
+
+		try {
+			// let savedVideos = await uservideos.save()
+			let storiesAdd = await uservideos.findByIdAndUpdate(userId, {
+				$push: {
+					video: trimmedVideo.url,
+				},
+			})
+			console.log(storiesAdd)
+			res.status(201)
+		} catch (err) {}
+	}
+)
+
+videouploadrouter.post(
+	'/singleImage',
+	userAuthentication,
 	upload.single('video'),
 	trimmed,
 	cloudinaryMiddleware,
@@ -218,7 +272,7 @@ videouploadrouter.put(
 	async (req: any, res: any) => {
 		const userId = req['auth']?.userId
 		let trimmedVideo = req.cloudinaryMiddleware
-		console.log('three', trimmedVideo.url)
+		
 
 		const uservideos = new UserVideos({
 			userId: userId,
