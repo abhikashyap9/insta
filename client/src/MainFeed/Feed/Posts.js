@@ -34,8 +34,7 @@ function Posts(props) {
     
     const { user,name,location,userImages,caption,userName,active,handleClick,handleLikeClicks,userProfile,postProfile,getCommentValues,share,showComments,setCommentValue,currentUserProfileImage } = props
     let userId=localStorage.getItem("userid")
-    // console.log('showcomments',showComments)
-    console.log(postProfile)
+    
   return (
     <div>
      <Container >
@@ -98,7 +97,7 @@ function Posts(props) {
       <NameText>{caption}</NameText>
       </LikedByContainer>
      {
-      console.log(showComments) || showComments.length > 0 ? 
+      showComments.length > 0 ? 
       <div>
      { showComments.map((comp)=>{
         return <> 
@@ -132,7 +131,7 @@ function Posts(props) {
          placeholder="Add a comment..." 
          className="outline-none"
          onChange={getCommentValues}
-         value={console.log('com',setCommentValue)||setCommentValue}
+         value={setCommentValue}
          />
          </CommentsInput>
         <CommentButton>

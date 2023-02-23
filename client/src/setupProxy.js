@@ -1,3 +1,4 @@
+const { createProxyMiddleware } = require('http-proxy-middleware');
 module.exports = (app) => {
     app.use((_, res, next) => {
       res.setHeader("Cross-Origin-Opener-Policy", "same-origin");

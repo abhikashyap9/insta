@@ -45,9 +45,7 @@ profilerouter.post('/userdetails', jwtauthorization_1.default, (req, res) => __a
     }
 }));
 profilerouter.get('/otherprofiles', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let users = yield Profile_1.default.find()
-        .populate('user')
-        .populate('userDetails');
+    let users = yield Profile_1.default.find().populate('user').populate('userDetails');
     console.log(users);
     try {
         res.status(200).json(users);

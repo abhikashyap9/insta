@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useRef } from "react";
-import Stories from "../Stories/Stories.js";
+import React, { useEffect, useState, useRef,Component } from "react";
+import Storiess from "../Stories/Stories.js";
 import Posts from "./Posts";
 import AddPost from "../../services/addpost.service";
 import Footer from "../Footer/Footer.js";
@@ -12,44 +12,15 @@ import "react-js-dialog-box/dist/index.css";
 import Nouislider from "nouislider-react";
 import "nouislider/distribute/nouislider.css";
 import "../../App.css";
+import './Feed.css'
 import Video from "../../services/video.service.js";
-import Carousel from "react-instagram-carousel";
-
-const images = [
-  "https://pixlr.com/images/index/remove-bg.webp",
-  "https://tinypng.com/images/social/website.jpg",
-  "http://res.cloudinary.com/duloaclhy/video/upload/v1676566791/gatupa8uosqsgpyooyxl.mp4",
-  // "https://images.ctfassets.net/kdawwlsweh27/2LtummpjO849eQ83yGGiUN/b33c73279163c84b65241cdfcc1c8844/Fresh_Stock_Content.jpg",
-];
-// import "swiper/css/navigation";
-// import "swiper/css/pagination";
-
-// init Swiper:<div class="reactInstagramCarousel__image" style="background-image: url("https://tinypng.com/images/social/website.jpg"); background-size: cover; background-color: rgb(32, 35, 34); opacity: 1;"></div>
-// const swiper = new Swiper(".swiper", {
-//   // configure Swiper to use modules
-//   // modules: [Navigation, Pagination],
-//   direction: "vertical",
-//   loop: true,
-
-//   // If we need pagination
-//   pagination: {
-//     el: ".swiper-pagination",
-//   },
-
-//   // Navigation arrows
-//   navigation: {
-//     nextEl: ".swiper-button-next",
-//     prevEl: ".swiper-button-prev",
-//   },
-
-//   // And if we need scrollbar
-//   scrollbar: {
-//     el: ".swiper-scrollbar",
-//   },
-// });
-
-// .noUi-horizontal .noUi-handle class of white controller box
+import CardNew from "./CardNew.js";
+import { v4 as uuidv4 } from "uuid";
+import Carousel from 'react-spring-3d-carousel';
+import Carroussel from "./Carousels.js";
+import Content from './Content'
 let ffmpeg; //Store the ffmpeg instance
+
 
 function Feed(props) {
   const { name } = props;
@@ -75,7 +46,38 @@ function Feed(props) {
   const [allStories, setAllStories] = useState([]);
   const videoRef = useRef();
   let initialSliderValue = 0;
+ 
+  let cards = [
+    {
+      key: uuidv4(),
+      content: <Content/>
+    },
+    {
+      key: uuidv4(),
+      content: <Content/>
+    },
+    {
+      key: uuidv4(),
+      content: <Content/>
+  
 
+    },
+    {
+      key: uuidv4(),
+      content:<Content/>  },
+    {
+      key: uuidv4(),
+      content:<Content/>
+    },
+    {
+      key: uuidv4(),
+      content: <Content/>
+    },
+    {
+      key: uuidv4(),
+      content: <Content/>
+    }
+  ];
   const convertToHHMMSS = (val) => {
     const secNum = parseInt(val, 10);
     let hours = Math.floor(secNum / 3600);
@@ -128,6 +130,7 @@ function Feed(props) {
       };
     }
   }, [videoSrc]);
+  
 
   //Called when handle of the nouislider is being dragged
   const updateOnSliderChange = (values, handle) => {
@@ -217,13 +220,13 @@ function Feed(props) {
           onFulfilled(script);
         }
         loaded = true;
-      };
+      }
       script.onerror = function () {
         console.log("Script failed to load");
-      };
+      }
       document.getElementsByTagName("head")[0].appendChild(script);
-    });
-  };
+    })
+  }
 
   const handleClick = (e) => {
     switch (e.detail) {
@@ -252,7 +255,7 @@ function Feed(props) {
       if (isStorie) {
         setIsStories(true);
       } else {
-        setIsStories(true);
+        setIsStories(false);
       }
       let profilePicture = data.profilePicture;
       let setProfile = profilePicture[0];
@@ -476,6 +479,7 @@ function Feed(props) {
     formdata.append("video", videos);
     formdata.append("startTime", startTime);
     formdata.append("endTime", endTime);
+    console.log('isStorie',isStories)
     if (isStories) {
       Video.putVideoStorie(formdata, auth)
         .then((res) => {
@@ -517,9 +521,6 @@ function Feed(props) {
         <ReactDialogBox
           closeBox={closeBox}
           modalWidth="50%"
-          // headerBackgroundColor='black'
-          // headerTextColor='white'
-          // headerHeight='65'
           closeButtonColor="white"
           bodyBackgroundColor="black"
           bodyTextColor="black"
@@ -552,48 +553,26 @@ function Feed(props) {
       {isshowStorie && (
         <ReactDialogBox
           closeBox={closeBox}
-          modalWidth="50%"
-          // headerBackgroundColor="black"
-          // headerTextColor="white"
-          // headerHeight="65"
-          // closeButtonColor="white"
-          // bodyBackgroundColor="black"
-          // bodyTextColor="black"
+          modalWidth="100%"
           bodyHeight="100%"
         >
-          <div style={{ width: "400px", height: "600px" }}>
-            {/* <Carousel images={images} /> */}
-            {/* <div class="reactInstagramCarousel__image">
-              {/* <Video src="http://res.cloudinary.com/duloaclhy/video/upload/v1676566791/gatupa8uosqsgpyooyxl.mp4"></Video>
-              <video className="w-2/4 m-auto" controls>
-                <source
-                  src={""}
-                  // type={videoFileValue.type}
-                />
-              </video> */}
-            {/* </div>  */}
+          
 
-            <div>
-              {/* <div>{name}</div> */}
-              <div>
-                {/* images */}
-                {/* <div className="geeks"></div> */}
-                <div
-                  className="progress-bar"
-                  // style="--width: 10"
-                  data-label="Loading..."
-                ></div>
-                {/* videos */}
-              </div>
-              <div></div>
-            </div>
-          </div>
+    <Carroussel
+        cards={cards}
+        height="500px"
+        width="90%"
+        margin="0 auto"
+        offset={4}
+        showArrows={false}
+      /> 
+        
         </ReactDialogBox>
       )}
 
       <div className="lg:w-4/5 sm:w-full flex justify-between">
         <div className="lg:basis-3/5 sm:w-full">
-          <Stories
+          <Storiess
             addStories={modal}
             showPhoto={() => setisShowStorie(true)}
             stories={allStories}
@@ -606,27 +585,16 @@ function Feed(props) {
                   location={current.location}
                   userImages={current.image}
                   caption={current.caption}
-                  userName={current.userId.userName}
-                  //  handleClick={()=>handleLikeClicks(current.id)}
-                  active={
-                    current.likedBy?.includes(userId) ? "active" : "notactive"
-                  }
+                  userName={current.userId.userName}     
+                  active={current.likedBy?.includes(userId) ? "active" : "notactive" }
                   handleLikeClicks={() => handleLikeClicks(current.id)}
-                  //  userProfile={userProfile}
-                  //  getName={()=>getName(current.userId.id)}
                   key={current.id}
                   user={current.userId.id}
                   share={() => share(current.id)}
                   getCommentValues={getCommentValues}
                   showComments={current?.comment}
-                  postProfile={
-                    console.log(current.userId?.profilePicture[0]) ||
-                    current.userId?.profilePicture[0]
-                  }
-                  setCommentValue={
-                    console.log("commentvalue in fee", commentValue) ||
-                    commentValue
-                  }
+                  postProfile={current.userId?.profilePicture[0]}
+                  setCommentValue={commentValue}
                   currentUserProfileImage={currentUser}
                 />
               );

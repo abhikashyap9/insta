@@ -6,17 +6,20 @@ const UserVideos = new mongoose.Schema({
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'signupuser',
 	},
-	video: [
+	storie: [
 		{
-			type: String,
-			// required:[true,'Please enter a video']
+			url: String,
+			identifier:String,
+		
+			createdAt: {
+		   type: Date,
+		    default: Date.now(),
+	         },
+			
 		},
 	],
 
-	createdAt: {
-		type: Date,
-		default: Date.now(),
-	},
+	
 })
 
 UserVideos.set('toJSON', {
