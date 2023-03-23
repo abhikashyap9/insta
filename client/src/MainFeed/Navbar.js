@@ -3,6 +3,10 @@ import { Link } from 'react-router-dom';
 import tw from 'tailwind-styled-components'
 import '../App.css'
 
+import { useSelector } from "react-redux";
+
+
+
 const Nav = tw.div`
    bg:transparent
    h-80px
@@ -35,8 +39,10 @@ const NavPart3=tw.div`
 basis-1/4 cursor-pointer text-center`
 
 function Navbar(props) {
-   const { instaLogo,searchBar,profile,setProfile,profileImage } = props;
+   const { instaLogo,searchBar,profile,setProfile,profileImage,newDiv } = props;
    const [colorChange, setColorchange] = useState(false);
+   const currentUser=useSelector((state)=>state.userData)
+   const {userName,userProfilePicture} = currentUser
   
    const changeNavbarColor = () =>{
      if(window.scrollY >= 60){
@@ -57,16 +63,25 @@ function Navbar(props) {
             
             <NavPart2>
               {searchBar}
+              {newDiv}
             </NavPart2>
           
            
           <NavPart3 >
+            <div className='flex justify-center items-center'>
+            <div>
           <Link to={setProfile}> 
             <img
             className="inline-block h-6 w-6 rounded-full ring-2 ring-white"
-            src={`https://instaserver-26it.onrender.com/${profileImage}`}
+            src={`http://localhost:3001/${userProfilePicture}`}
+
             alt='image' />
             </Link>
+            </div>
+
+            <div className='text-base ml-2'><p >{userName}</p></div>
+            </div>
+
             </NavPart3>
             
           </NavBox>

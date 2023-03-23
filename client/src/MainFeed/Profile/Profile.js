@@ -8,6 +8,7 @@ import '../../App.css';
 import EditProfile from './EditProfile'
 import UserProfile from '../../services/userProfile.service'
 import AddPosts from '../../services/addpost.service'
+import ProfileImagesModal from './ProfileImagesModal'
 
 function Profile() {
 
@@ -18,6 +19,9 @@ function Profile() {
   const [followers,setFollowers] =useState([])
   const [followings,setFollowings] = useState([])
   const [update,setUpdate]=useState([])
+  const [userData,setUserData]=useState([])
+  const [isOpenProfile,setIsOpenProfile]=useState(false)
+  let userId = localStorage.getItem('userid')
 
   const closeBox = () => { setIsOpen(false) }
 
@@ -68,8 +72,25 @@ function Profile() {
       setProfileImage(setProfile)
     })
 
+    UserProfile.userPosts(auth).then((res) => {
+      console.log(res)
+      setUserData(res.data)
+    })
+
   }, [update])
-  
+
+
+
+
+
+// ................................................................................
+
+
+
+  const openProfileModal=()=>{
+    setIsOpenProfile(true)
+  }
+ 
 
   return (
     <>
@@ -103,15 +124,24 @@ function Profile() {
           </ReactDialogBox>
         </>
       )}
+      {isOpenProfile&& <ProfileImagesModal
+                        userData={userData}
+                        closeProfileModal={()=>setIsOpenProfile(false)}
+      />}
       {profile &&
-        <div className='border h-screen bg-white'>
+        <div className=''>
 
           
-          <div className='flex py-2 mt-2'>
+          <div className='flex py-2 mt-2 xs:items-center'>
 
             <ProfilePicture
               profileImage={profileImage}
-              openModal={() => setIsOpen(true)} />
+              openModal={() => setIsOpen(true)}
+              profileFullName={user.fullName}
+
+              />
+             
+
 
             <div className=''>
               <ProfileHeader editOrFollow={'EditProfile'}
@@ -128,8 +158,14 @@ function Profile() {
 
           </div>
           {/* .............Post Section................ */}
-          <div className='border border-t-gray-50 mt-8 pt-2'>
-            <SavedPost />
+
+
+          <div className='border-t-2 border-gray-200 mt-8 pt-2 px-2'>
+            <SavedPost 
+            userData={userData}
+            openProfileModal={openProfileModal}
+
+            />
           </div>
 
         </div>

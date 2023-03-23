@@ -12,14 +12,18 @@ const getStories = (auth) => {
   let url = baseUrl + `/getAllStories`;
   return axios.get(url, { headers: { Authorization: `Bearer ${auth}` } });
 };
+const putVideoStorie= (formData, id) => {
+  let url = baseUrl + `/putVideoStorie/${id}`;
+  return axios.put(url, formData);
+};
 
-// const postVideo=async(formdata,auth)=>{
-//     console.log('services',formdata)
-//     let url=baseUrl+'/singleVideo'
-//     let response=await axios.post(url,formdata,{headers:{'Authorization':`Bearer ${auth}`}})
-//     return response
-
-// }
-
-const Video = { addVideo, getStories };
+const postImageStorie=(formData,auth)=>{
+  let url=baseUrl + `/singleImage`
+  return axios.post(url,formData,{headers:{Authorization:`Bearer ${auth}`}})
+}
+const putImageStorie=(formData,id)=>{
+  let url=baseUrl + `/singleImage/${id}`
+  return axios.put(url,formData)
+}
+const Video = { addVideo,getStories,putVideoStorie,postImageStorie,putImageStorie };
 export default Video;

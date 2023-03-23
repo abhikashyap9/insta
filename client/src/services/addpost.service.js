@@ -53,10 +53,39 @@ const addComment=(auth,postId,data)=>{
         }
     })
 }
+const addReply=(auth,commentId,data)=>{
+    // console.log(postId)
+    console.log('Helloo',commentId,data)
+    let url =baseUrl+`/addCommentReply/${commentId}`;
+    return axios.put(url,data,{
+        headers: {
+          'Authorization': `Bearer ${auth}` 
+        }
+    })
+}
 
-
+const deleteComment=(auth,commentId,postId)=>{
+    // // console.log(postId) 
+    // console.log('Helloo',commentId,data)
+    let url =baseUrl+`/deleteComment/${commentId}?postId=${postId}`;
+    return axios.delete(url,{
+        headers: {
+          'Authorization': `Bearer ${auth}` 
+        }
+    })
+}
+const deleteCommentReply=(auth,replyId)=>{
+    // // console.log(postId) 
+    // console.log('Helloo',commentId,data)
+    let url =baseUrl+`/deleteCommentReply/${replyId}`;
+    return axios.delete(url,{
+        headers: {
+          'Authorization': `Bearer ${auth}` 
+        }
+    })
+}
 
 const AddPosts={
-    addComment,addLike,addSinglePost,userUpload,addProfileImage,removeLike
+    addComment,addLike,addSinglePost,userUpload,addProfileImage,removeLike,addReply,deleteComment,deleteCommentReply
 }
 export default AddPosts;

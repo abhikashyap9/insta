@@ -9,8 +9,11 @@ import DummyPic from '../../image/dumyPic.svg.png'
 import Feedoption from './Feedoption.js';
 import tw from 'tailwind-styled-components'
 import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faHeart } from '@fortawesome/free-solid-svg-icons'
 
-const Container=tw.div`main border rounded-lg my-2 bg-white`
+
+const Container=tw.div`main lg:border rounded-lg my-2 bg-white`
 const Header=tw.div`header flex justify-between p-4`
 const HeaderItemsContainer=tw.div`flex items-center`
 const ImagesContainer=tw.div`mr-2 cursor-pointer`
@@ -20,9 +23,9 @@ const Options=tw.div`rightIndex`
 const ImagesBox=tw.div`rightIndex`
 const PostIcons=tw.div`px-1`
 const IconsSpace=tw.div`flex justify-between ..`
-const LikedByContainer=tw.div`m-2 flex items-center`
-const LikedBy=tw.p`text-sm font-semibold`
-const NameText=tw.p`ml-2 text-sm`
+const LikedByContainer=tw.div`m-2 flex items-center cursor-pointer`
+const LikedBy=tw.p`text-sm `
+const NameText=tw.p`ml-2 text-sm font-semibold`
 const CommentsContainer=tw.div`flex items-center`
 const CommentImages=tw.div`border-4 border-rose-400 rounded-full ...  cursor-pointer m-2`
 const CommentsInput=tw.div`basis-5/6`
@@ -32,17 +35,25 @@ const CommentButtonPost=tw.button`text-sm disabled:opacity-100 ... disabled:opac
 
 function Posts(props) {
     
-    const { user,name,location,userImages,caption,userName,active,handleClick,handleLikeClicks,userProfile,postProfile,getCommentValues,share,showComments,setCommentValue,currentUserProfileImage } = props
+    const { keys,user,name,location,userImages,caption,userName,active,handleClick,handleLikeClicks,userProfile,postProfile,getCommentValues,share,showComments,setCommentValue,currentUserProfileImage,count,openLikesModal,openCommentsModal,commentsModal } = props
+    
+    let countFirstName=count[0]?.userName
+    let countS=count.length-1>1?'s':''
+    let others=count.length>1?`and ${count.length-1} other${countS}`:'';
+   console.log(postProfile)
     let userId=localStorage.getItem("userid")
+  
     
   return (
-    <div>
+    <div key={keys}>
      <Container >
       <Header>
         <HeaderItemsContainer>
           <ImagesContainer onClick={userProfile}>
             <img 
-             src={`https://instaserver-26it.onrender.com/${postProfile}`} 
+            src={`${postProfile ? `http://localhost:3001/${postProfile}`:DummyPic}`}
+            
+            // src={`https://instaserver-26it.onrender.com/${postProfile}`} 
              alt="stories" 
              loading="lazy" 
              className="inline-block h-8 w-8 rounded-full ring-2 ring-white object-cover"
@@ -72,25 +83,36 @@ function Posts(props) {
       <PostIcons>
         <IconsSpace>
          <Feedoption 
-                    Icon={<FavoriteBorderIcon color={active==='active'?"primary":''} />}
+                    Icon={active==='active'?<FontAwesomeIcon icon={faHeart} className="text-lg text-red-600"/>:<FavoriteBorderIcon fontSize="small"/>}
                     likesCount="Likes"
                     modal={handleLikeClicks} 
+                    rightBorder={2}
                     />
-         <Feedoption Icon={<ChatBubbleOutlineIcon />}
+         <Feedoption modal={openCommentsModal}
+                    
+                      Icon={<ChatBubbleOutlineIcon   fontSize="small"/>}
                      likesCount="Comment"
+          rightBorder={2}
+
          />
-         <Feedoption Icon={<IosShareIcon/>}
+         <Feedoption Icon={<IosShareIcon   fontSize="small"/>}
                      likesCount="Share"
+          rightBorder={2}
+
          />
-         <Feedoption Icon={<BookmarkBorderIcon/>}
+         <Feedoption
+          rightBorder={0}
+          Icon={<BookmarkBorderIcon   fontSize="small"/>}
           likesCount="Save"
          />
         </IconsSpace>
         
       </PostIcons>
-      <LikedByContainer>
-      <LikedBy>Liked by</LikedBy>
-      <NameText>count</NameText>
+      <LikedByContainer onClick={openLikesModal}>
+      
+      {count.length>0?<><LikedBy>Liked by</LikedBy><NameText>{countFirstName} {others}</NameText></>:<></>}
+      {/* {<><LikedBy>Liked by</LikedBy><NameText>{countFirstName}</NameText></>:<></>} */}
+
       </LikedByContainer>
       <LikedByContainer>
       {caption && <LikedBy>{userName}</LikedBy>}
@@ -98,13 +120,14 @@ function Posts(props) {
       </LikedByContainer>
      {
       showComments.length > 0 ? 
-      <div>
-     { showComments.map((comp)=>{
+      <div className='ml-2 cursor-pointer'>
+     {/* { showComments.map((comp)=>{
         return <> 
         <div className='flex items-center ml-2'>
         <ImagesContainer>
             <img className="inline-block h-8 w-8 rounded-full ring-2 ring-white"
-             src={`https://instaserver-26it.onrender.com//${comp?.postedBy?.profilePicture[0]}`}
+            src={`${comp?.postedBy?.profilePicture.length>0 ? `http://localhost:3001/${comp?.postedBy?.profilePicture[0]}`:DummyPic}`}
+            
              alt="stories" 
              loading="lazy" />
           </ImagesContainer>
@@ -113,13 +136,14 @@ function Posts(props) {
       </div>
       </>
       })
-    }
+    } */}
+    <p className='text-sm text-slate-500' onClick={commentsModal}>View All Comments</p>
       </div>:<></>
     }
       <CommentsContainer> 
         <CommentImages>
         <img 
-            src={`${currentUserProfileImage ? `https://instaserver-26it.onrender.com/${currentUserProfileImage}`:DummyPic}`}
+            src={`${currentUserProfileImage ? `http://localhost:3001/${currentUserProfileImage}`:DummyPic}`}
             alt="profile" 
             load="lazy" 
             className="inline-block h-8 w-8 rounded-full ring-2 ring-white"    

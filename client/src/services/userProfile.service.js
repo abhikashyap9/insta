@@ -26,7 +26,17 @@ const userUnfollow =(id,auth)=>{
     return axios.put(url,{},{headers:{'Authorization': `Bearer ${auth}`}});
 }
 
+const searchUser=(search)=>{
+    let url = baseUrl + `/searchUser?search=${search}`;
+    return axios.get(url,{});
+    
+}
+
+const userPosts =(auth)=>{
+    let url = baseUrl+'/userPosts';
+    return axios.get(url,{headers:{'Authorization': `Bearer ${auth}`}})
+}
 const UserProfile={
-    userGet,userImage,getUserById,userFollow,userUnfollow
+    userGet,userImage,getUserById,userFollow,userUnfollow,searchUser,userPosts
 }
 export default  UserProfile;

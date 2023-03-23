@@ -54,5 +54,115 @@ display:none;
   }
 
   ._3qw0K{
-    background: rgb(0 0 0 / 93%) !important;
+    background: black !important;
+    
   }
+  ._Xt-75{
+    background: black !important;
+    height:100%;
+    margin:0;
+    padding: 0;
+  }
+
+  .css-1fzpoyk{
+    opacity:0.8 !important;
+    backdrop-filter: blur(15px); 
+  }
+  .carousel_height{
+    height:800px;
+    background-position: center; /* Center the image */
+    background-repeat: no-repeat; /* Do not repeat the image */
+    background-size: cover;
+  }
+  .css-1fzpoyk img{
+    object-fit: cover !important;
+  }
+  ._2MJ9D{
+    margin: 24px 0px !important;
+  }
+
+  .css-1fzpoyk>div>div>div{
+
+padding: 7px 8px 5px !important;
+
+  }
+
+  .css-1fzpoyk span p{
+    text-align: left;
+  }
+
+  .modal {/* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 999; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+/* Enable scroll if needed */
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+  }
+  
+  /* Modal Content/Box */
+  .modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* 15% from the top and centered */
+    border: 1px solid #888;
+    width: 25%; /* Could be more or less, depending on screen size */
+    border-radius: 4px;
+
+  }
+  
+  /* The Close Button */
+  .close {
+    color: #aaa;
+    /* float: right; */
+    font-size: 28px;
+    font-weight: bold;
+  }
+  
+  .close:hover,
+  .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .comments {
+    margin:7% auto !important;
+   width:28% !important; 
+   min-height:50vh; 
+  }
+  @media only screen and (min-device-width: 320px) and (max-device-width: 480px) {
+    /* insert styles here */
+    .sidebar_feed{
+      flex-basis:0% !important;
+    }
+    .main_feed{
+      flex-basis:100% !important;
+    }
+    .comments {
+      margin:0% auto !important;
+     width:100% !important; 
+     min-height:100vh; 
+    }
+    .comments_contents{
+      height:80vh;
+    }
+    .likes_modal{
+      margin:0% auto !important;
+     width:100% !important; 
+     min-height:100vh; 
+    }
+    /* . */
+
+}
+.sidebar_feed{
+  flex-basis:34%
+
+}
+  .main_feed{
+    flex-basis:56%
+  }
+ 
+
