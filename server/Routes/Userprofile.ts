@@ -93,22 +93,25 @@ profilerouter.put('/profileimage', upload.single('image'), async (req, res) => {
 	}
 })
 
-// profilerouter.get('/profileimage',userAuthentication, async (req,res)=>{
-//    console.log(req.auth.userId)
-//    let id = req.auth.userId
+profilerouter.get('/searchUser', async (req:any,res:any)=>{
+  const {search}=req.query
+  console.log(search)
 
-//   const profilePicture = await UserProfilePicture.find({userId:`${id}`})
-//   const profileImage = profilePicture[profilePicture.length-1];
+  if(!search){
+	return res.status(400).json({err:'No Search Found'})
+  }
 
-//   // console.log(profilePicture);
-//   try{
-//     res.status(200).json(profileImage).end()
-//   }
-//   catch(err){
-//     console.log(err)
-//     res.status(400).json(err)
-//    }
+ 
+    try{
+		
+		let searchResults=await Signupuser.find({"userName":{$regex:".*"+search+".*",$options:"i"}})
+	    console.log(searchResults)
+		return res.status(200).json(searchResults)
+	}
+	catch(err){
+	return res.status(400).json({err:'No User Found'})
 
-// })
+	}
+})
 
 export default profilerouter

@@ -1,19 +1,24 @@
 import React from 'react'
+import './Profile.css'
 import DummyPic from '../../image/dumyPic.svg.png'
+import { useMatchMedia } from '../Sidebar/useMediaMatch';
 
 function ProfilePicture(props) {
 
-  const {openModal,profileImage}=props;  
+  const {openModal,profileImage,profileFullName}=props; 
+  const isDesktopResolution = useMatchMedia("(min-width:600px)", true);
+
 
 
   return (
     <>
-        <div className='px-12' onClick={openModal}>
+        <div className='cursor-pointer xs:pl-4' onClick={openModal}>
+       
         <img
-            className="inline-block h-36 w-36 rounded-full ring-2 ring-white object-cover"
-            src={`${profileImage ? `https://instaserver-26it.onrender.com/${profileImage}`:DummyPic}`}
+            className="circle_imageProfile h-12 w-12 "
+            src={`${profileImage ? `http://localhost:3001/${profileImage}`:DummyPic}`}
             alt='image' />
-            
+        {!isDesktopResolution &&<p>{profileFullName}</p>}
         </div>
     </>
   )

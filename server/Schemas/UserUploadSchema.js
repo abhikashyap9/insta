@@ -24,12 +24,31 @@ const UserUploads = new mongoose.Schema({
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'signupuser',
+            // liked: {type: String},
+            // postedBy: {type: mongoose.Schema.Types.ObjectId, ref: 'signupuser'},
         },
     ],
     comment: [
         {
-            comments: { type: String },
-            postedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'signupuser' },
+            comments: {
+                type: String,
+            },
+            postedBy: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'signupuser'
+            },
+            replies: {
+                reply: {
+                    type: String,
+                },
+                postedBy: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: 'signupuser'
+                },
+                id: {
+                    type: mongoose.Schema.Types.ObjectId,
+                },
+            }
         },
     ],
     createdAt: {

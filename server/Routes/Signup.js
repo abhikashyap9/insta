@@ -63,15 +63,19 @@ exports.signrouter.post('/login', (req, res) => __awaiter(void 0, void 0, void 0
     const useForToken = {
         username: user.userName,
         id: user._id,
+        profilePicture: user.profilePicture,
+        isStorie: user.isStorie
     };
     const token = jsonwebtoken_1.default.sign(useForToken, process.env.SECRET, {
         expiresIn: 600 * 600,
     });
     res.status(200).send({
         token,
-        username: user.fullName,
-        userfullname: user.userName,
+        username: user.userName,
+        userfullname: user.fullName,
         id: user._id,
+        isStorie: user === null || user === void 0 ? void 0 : user.isStorie,
+        userProfilePicture: user === null || user === void 0 ? void 0 : user.profilePicture
     });
 }));
 const getTokenFrom = (request) => {
@@ -86,7 +90,6 @@ exports.signrouter.get('/userprofile/i', jwtauthorization_1.default, (req, res) 
     let decodedToken = (_a = req['auth']) === null || _a === void 0 ? void 0 : _a.userId;
     try {
         let user = yield Signupschema_1.default.findById(decodedToken);
-        console.log('user', user);
         if (user) {
             return res.status(200).json(user);
         }
@@ -111,7 +114,8 @@ exports.signrouter.put('/follow/:id', jwtauthorization_1.default, (req, res) => 
     var _b;
     const { id } = req.params;
     let followingId = (_b = req['auth']) === null || _b === void 0 ? void 0 : _b.userId;
-    // console.log('request',req)
+    console.log('aryanid', id);
+    console.log('rakshitid', followingId);
     try {
         let follower = yield Signupschema_1.default.findByIdAndUpdate(followingId, { $push: { following: id } }, { new: true });
         let following = yield Signupschema_1.default.findByIdAndUpdate(id, { $push: { followers: followingId } }, { new: true });

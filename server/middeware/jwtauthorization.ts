@@ -15,9 +15,9 @@ export interface RequestAuthType extends Request {
 }
 const userAuthentication = (req: RequestAuthType, res: Response, next: any) => {
 	const token = getTokenFrom(req)
-	// console.log(token)
+	console.log(token)
 	const decodedToken = jwt.verify(token!, process.env.SECRET!) as UserType
-	// console.log('decoded', decodedToken)
+	console.log('decoded', decodedToken)
 	if (!decodedToken.id) {
 		return res.status(401).json({ error: 'token missing or invalid token' })
 	}

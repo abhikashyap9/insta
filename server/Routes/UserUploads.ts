@@ -2,6 +2,9 @@ import jwt from 'jsonwebtoken'
 import express, { Request, Response } from 'express'
 import multer from 'multer'
 import UserUploads from '../Schemas/UserUploadSchema'
+import CommentReplies from '../Schemas/RepliesSchema'
+
+
 import UserVideo from '../Schemas/UserVideosSchema'
 
 import userAuthentication from '../middeware/jwtauthorization'
@@ -66,7 +69,12 @@ export interface RequestAuthType extends Request {
 	auth?: { userId?: string }
 }
 useruploadsrouter.get('/userpost', async (req, res) => {
-	let uploads = await UserUploads.find().populate('userId', 'userName profilePicture').populate("comment.postedBy")
+	let uploads = await UserUploads.find()
+	.populate('userId', 'userName profilePicture')
+	.populate("comment.postedBy")
+	.populate("likedBy")
+	.populate("comment.replies.postedBy")
+	// 
 	console.log(uploads)
 	//    .populate('commentedBy')
 	//    .exec()
@@ -139,5 +147,141 @@ useruploadsrouter.put('/addcomment/:id', userAuthentication, async (req: Request
 	}
 })
 
+
+useruploadsrouter.put('/addcommentreply/:id', userAuthentication, async (req: RequestAuthType, res) => {
+	const { id } = req.params
+	console.log(id)
+	let userId = req['auth']?.userId
+	console.log(userId)
+	const { comment,postId } = req.body
+	console.log('BBBB',comment)
+	const generateMongoObjectId = () => {
+		const thousand = 1000;
+		const sixteen = 16;
+		const timestamp = ((new Date().getTime() / thousand) | 0).toString(sixteen);
+	  
+		return (
+		  timestamp +
+		  "xxxxxxxxxxxxxxxx"
+			.replace(/[x]/g, function () {
+			  return ((Math.random() * sixteen) | 0).toString(sixteen);
+			})
+			.toLowerCase()
+		);
+	  };
+	let uniqueId=  generateMongoObjectId()
+
+	let commentreplies ={
+		reply: comment,
+		postedBy: userId,
+		id:uniqueId
+	}
+
+	try {
+		let posted = await UserUploads.updateOne({
+			id: postId,
+			"comment._id": id
+		  },
+		  {
+			$push: {
+			  "comment.$.replies":commentreplies
+			}
+		  },{new:true})
+
+			// .populate('comment.postedBy', '_id userName profilePicture')
+			
+		console.log('post', posted)
+		return res.status(200).json(posted)
+	} catch (err) {
+		return res.status(400).json({ error: err })
+	}
+})
+
+useruploadsrouter.delete('/deleteComment/:id',userAuthentication,async(req:RequestAuthType,res)=>{
+	const { id } = req.params
+	const {postId}=req.query
+	
+	console.log('id',id)
+	let userId = req['auth']?.userId
+	
+	console.log('userId',userId)
+	console.log('postId',postId)
+try{
+	let deleted = await UserUploads.updateOne({
+		"_id": postId
+	  },
+	  {
+		$pull: {
+		  "comment": {
+			"_id": id
+		  }
+		}
+	  })
+	  console.log(deleted)
+	return res.status(204).json(deleted)
+}
+catch(err){
+	return res.status(404).json({ error: err })
+
+}
+})
+
+useruploadsrouter.delete('/deleteCommentReply/:id',userAuthentication,async(req:RequestAuthType,res)=>{
+	const { id } = req.params
+	const {postId}=req.query
+	
+	console.log('id',id)
+	let userId = req['auth']?.userId
+	console.log('userId',userId)
+	console.log('postId',postId)
+try{
+	let deleted = await UserUploads.findOneAndUpdate(
+		{ 'comment': 
+		{ $elemMatch: 
+			{ 'replies.id': id } } },
+	{ $pull: 
+		{ 'comment.$.replies': 
+		{ id: id } } },)
+	  console.log(deleted)
+	return res.status(204).json(deleted)
+}
+catch(err){
+	return res.status(404).json({ error: err })
+
+}
+})
+
+
+useruploadsrouter.get('/userPosts',userAuthentication, async (req, res) => {
+	let userId = req['auth']?.userId
+	
+	let uploads = await UserUploads.find({"userId":userId})
+	.populate('userId', 'userName profilePicture')
+	.populate("comment.postedBy")
+	.populate("likedBy")
+	.populate("comment.replies.postedBy")
+	// 
+	console.log(uploads)
+	//    .populate('commentedBy')
+	//    .exec()
+	// let profileImage = await UserUploads.aggregate([
+	//     {$lookup:{
+	//     from:'userprofilepicture',
+	//     localField:'userId',
+	//     foreignField:'userId',
+	//     as:'anything'
+	// }}])
+	// console.log(profileImage)
+	//    .populate()
+	//    .populate('profilePicture','image')
+
+	// let userId = await UserProfilePicture.findById()
+	if (uploads) {
+		console.log(uploads)
+		res.json(uploads).status(200)
+	} else {
+		res.status(400).json('error')
+	}
+})
 
 export default useruploadsrouter

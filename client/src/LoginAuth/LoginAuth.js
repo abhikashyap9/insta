@@ -5,6 +5,10 @@ import HaveAccount from './HaveAccount';
 import '../App.css';
 import Auth from '../services/AuthService/auth.service';
 import { useNavigate } from "react-router-dom";
+import {setUserData} from '../../src/features/LoginCredentials/userSlice'
+import { useSelector, useDispatch } from 'react-redux'
+import DummyPic from '../../src/image/dumyPic.svg.png'
+
 
 const validate = values => {
   
@@ -28,6 +32,7 @@ const validate = values => {
 
 const SignupForm = () => {
   const [state,setMyState]=useState(false);
+  const dispatch = useDispatch()
   let navigate = useNavigate();
 
   const formik = useFormik({
@@ -42,10 +47,20 @@ const SignupForm = () => {
         
          if(res.status===200){
           let { data }=res
-          const { token,username,id } =data
+          const { token,username,id,userProfilePicture,isStorie } =data
+          console.log(data)
+          let profilePicture=userProfilePicture.length>0?userProfilePicture[0]:DummyPic
+          let userLoginData={
+            userName:username,
+            userProfilePicture:profilePicture,
+            isStorie:isStorie?isStorie:false
+          } 
+          console.log(data)
+
           localStorage.setItem('token',token)
           localStorage.setItem('username',username)
           localStorage.setItem('userid',id)
+          dispatch(setUserData(userLoginData))
 
           navigate('/')
          }

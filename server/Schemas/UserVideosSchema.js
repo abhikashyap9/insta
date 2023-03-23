@@ -9,8 +9,11 @@ const UserVideos = new mongoose.Schema({
     },
     storie: [
         {
-            url: String,
+            url: { type: String, required: true },
             identifier: String,
+            thumbnailUrl: {
+                type: String,
+            },
             createdAt: {
                 type: Date,
                 default: Date.now(),

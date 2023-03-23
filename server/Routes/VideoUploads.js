@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const multer_1 = __importDefault(require("multer"));
 const UserVideosSchema_1 = __importDefault(require("../Schemas/UserVideosSchema"));
+const Signupschema_1 = __importDefault(require("../Schemas/Signupschema"));
 const EventEmitter = require('events');
 const eventEmitter = new EventEmitter();
 const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
@@ -58,6 +59,15 @@ const upload = (0, multer_1.default)({
         cb(null, true);
     },
 });
+const fileStorageEngines = multer_1.default.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, './Routes/image');
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + '--' + file.originalname);
+    },
+});
+const uploads = (0, multer_1.default)({ storage: fileStorageEngines });
 const trimmed = (req, res, next) => {
     var _a, _b;
     // req.body= JSON.parse(JSON.stringify(req.body))
@@ -88,21 +98,6 @@ const trimmed = (req, res, next) => {
     req.trimmed = fileSaved;
     // ,upload.single('video')
 };
-const createThumbnail = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    let trimmedVideo = req.trimmed;
-    console.log(trimmedVideo);
-    const outputPath = Date.now() + "thumbnail.png";
-    ffmpeg(trimmedVideo)
-        .seekInput(1)
-        .frames(1)
-        .output(outputPath)
-        .on('end', () => {
-        console.log(outputPath);
-    })
-        .run();
-    //   req.thumbnail=`./public/uploads/thumbnail/${trimmedVideo}`
-    next();
-});
 const cloudinaryMiddleware = (req, res, next) => {
     let trimmedVideo = req.trimmed;
     cloudinary.v2.uploader.upload(trimmedVideo, { resource_type: 'video' }, (error, result) => __awaiter(void 0, void 0, void 0, function* () {
@@ -129,26 +124,58 @@ const getClodinaryUrl = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
         next();
     });
 });
-videouploadrouter.post('/singleVideo', jwtauthorization_1.default, upload.single('video'), trimmed, createThumbnail, cloudinaryMiddleware, getClodinaryUrl, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const createThumbnail = (req, res, next) => {
+    let trimmedVideo = req.trimmed;
+    let trimmedName = trimmedVideo.slice(25);
+    const outputPath = `./public/uploads/thumbnail/${trimmedName}.png`;
+    ffmpeg(trimmedVideo)
+        .seekInput(1)
+        .frames(1)
+        .output(outputPath)
+        .on('end', () => {
+        next();
+    })
+        .run();
+    req.thumbnail = outputPath;
+};
+const saveThumbnail = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const thumbnail = yield req.thumbnail;
+    console.log('Thumbnail', thumbnail);
+    try {
+        setTimeout(() => __awaiter(void 0, void 0, void 0, function* () {
+            const upload = yield cloudinary.uploader.upload(thumbnail, { width: 500, height: 500 });
+            if (upload) {
+                req.savedThumbnail = upload;
+                eventEmitter.emit('restart');
+                next();
+            }
+        }), 1000);
+    }
+    catch (err) {
+        console.log(err);
+    }
+});
+const getThumbnail = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    eventEmitter.on('restart', () => {
+        next();
+    });
+});
+videouploadrouter.post('/singleVideo', jwtauthorization_1.default, upload.single('video'), trimmed, getClodinaryUrl, cloudinaryMiddleware, createThumbnail, saveThumbnail, getThumbnail, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const userId = (_a = req['auth']) === null || _a === void 0 ? void 0 : _a.userId;
     let trimmedVideo = req.cloudinaryMiddleware;
-    console.log('three', trimmedVideo.url);
-    console.log('req.thumbnail', req.thumbnail);
+    let thumbnailUrl = req.savedThumbnail.url;
+    console.log('req.thumbnail', req.savedThumbnail);
     const uservideos = new UserVideosSchema_1.default({
         userId: userId,
-        storie: [{ url: trimmedVideo.url, identifier: 'video' }],
+        storie: [{ url: trimmedVideo.url, identifier: 'video', thumbnailUrl: thumbnailUrl }],
     });
     try {
         let savedVideos = yield uservideos.save();
-        // let storiesAdd = await Signupuser.findByIdAndUpdate(
-        // 	userId,
-        // 	{
-        // 		isStorie: true,
-        // 	},
-        // 	{new: true}
-        // )
-        console.log(savedVideos);
+        let storiesAdd = yield Signupschema_1.default.findByIdAndUpdate(userId, {
+            isStorie: true,
+        }, { new: true });
+        console.log(storiesAdd, savedVideos);
         res.status(201);
     }
     catch (err) { }
@@ -156,7 +183,7 @@ videouploadrouter.post('/singleVideo', jwtauthorization_1.default, upload.single
 videouploadrouter.get('/getAllStories', jwtauthorization_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _b;
     const userId = (_b = req['auth']) === null || _b === void 0 ? void 0 : _b.userId;
-    let gettingVideos = yield UserVideosSchema_1.default.find({}).populate('userId', 'userName');
+    let gettingVideos = yield UserVideosSchema_1.default.find({}).populate('userId', "-password");
     console.log(gettingVideos);
     try {
         return res.status(201).json(gettingVideos);
@@ -166,7 +193,9 @@ videouploadrouter.get('/getAllStories', jwtauthorization_1.default, (req, res) =
     }
 }));
 videouploadrouter.get('/getVideo/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const videoPath = ``;
+    const path = req.params;
+    console.log(path);
+    const videoPath = `${path}`;
     const videoStat = fs.statSync(videoPath);
     const fileSize = videoStat.fileSize;
     const videoRange = req.headers.range;
@@ -194,45 +223,58 @@ videouploadrouter.get('/getVideo/:id', (req, res) => __awaiter(void 0, void 0, v
         fs.createReadStream(videoPath).pipe(res);
     }
 }));
-videouploadrouter.put('/singleVideo', jwtauthorization_1.default, upload.single('video'), trimmed, cloudinaryMiddleware, getClodinaryUrl, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _c;
-    const userId = (_c = req['auth']) === null || _c === void 0 ? void 0 : _c.userId;
+videouploadrouter.put('/putVideoStorie/:id', 
+// userAuthentication,
+upload.single('video'), trimmed, getClodinaryUrl, cloudinaryMiddleware, createThumbnail, saveThumbnail, getThumbnail, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // const userId = req['auth']?.userId
+    const videoId = req.params.id;
+    console.log('videoId', videoId);
     let trimmedVideo = req.cloudinaryMiddleware;
-    const uservideos = new UserVideosSchema_1.default({
-        userId: userId,
-        video: [trimmedVideo.url],
-    });
+    let thumbnailUrl = req.savedThumbnail.url;
+    console.log('req.thumbnail', req.savedThumbnail);
     try {
-        // let savedVideos = await uservideos.save()
-        let storiesAdd = yield uservideos.findByIdAndUpdate(userId, {
-            $push: {
-                video: trimmedVideo.url,
-            },
-        });
-        console.log(storiesAdd);
+        const findPost = yield UserVideosSchema_1.default.findByIdAndUpdate(videoId, { $push: { "storie": { url: trimmedVideo.url,
+                    identifier: 'video',
+                    thumbnailUrl: thumbnailUrl } } });
+        console.log(findPost);
         res.status(201);
     }
     catch (err) { }
 }));
-videouploadrouter.post('/singleImage', jwtauthorization_1.default, upload.single('video'), trimmed, cloudinaryMiddleware, getClodinaryUrl, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _d;
-    const userId = (_d = req['auth']) === null || _d === void 0 ? void 0 : _d.userId;
-    let trimmedVideo = req.cloudinaryMiddleware;
-    const uservideos = new UserVideosSchema_1.default({
+videouploadrouter.post('/singleImage', jwtauthorization_1.default, uploads.single('image'), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _c, _d;
+    const userId = (_c = req['auth']) === null || _c === void 0 ? void 0 : _c.userId;
+    const imageFile = (_d = req['file']) === null || _d === void 0 ? void 0 : _d.path;
+    const upload = yield cloudinary.uploader.upload(imageFile, { width: 500, height: 500 });
+    const uservideos = yield new UserVideosSchema_1.default({
         userId: userId,
-        video: [trimmedVideo.url],
+        storie: [{ url: upload.url, identifier: 'image' }],
     });
+    let savedVideos = yield uservideos.save();
+    let storiesAdd = yield Signupschema_1.default.findByIdAndUpdate(userId, {
+        isStorie: true,
+    }, { new: true });
+    let [uploads, uservideoss, savedVideoss, storiesAdds] = yield Promise.allSettled([upload, uservideos, savedVideos, storiesAdd]);
+    console.log(uploads, savedVideoss, storiesAdds);
+    res.status(201).json(savedVideoss + " " + storiesAdds);
+}));
+videouploadrouter.put('/singleImage/:id', uploads.single('image'), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _e;
+    const imageFile = (_e = req['file']) === null || _e === void 0 ? void 0 : _e.path;
+    const storyId = req.params.id;
+    console.log(storyId);
+    console.log(imageFile);
     try {
-        // let savedVideos = await uservideos.save()
-        let storiesAdd = yield uservideos.findByIdAndUpdate(userId, {
-            $push: {
-                video: trimmedVideo.url,
-            },
-        });
-        console.log(storiesAdd);
-        res.status(201);
+        const upload = yield cloudinary.uploader.upload(imageFile, { width: 500, height: 500 });
+        const findPost = yield UserVideosSchema_1.default.findByIdAndUpdate(storyId, { $push: { "storie": { url: upload.url,
+                    identifier: 'image',
+                } }, new: true });
+        let [newUploads, newPosts] = yield Promise.allSettled([upload, findPost]);
+        res.status(201).json(newPosts);
     }
-    catch (err) { }
+    catch (err) {
+        res.status(400).json(err);
+    }
 }));
 // videouploadrouter.post('/singleImage',userAuthentication,upload.single('image'),async (req:any, res:any) => {
 // })
