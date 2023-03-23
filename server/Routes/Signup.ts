@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken'
+import otpGenerator from 'otp-generator';
 import express, {Request, Response} from 'express'
 export const signrouter = express.Router({
 	strict: true,
@@ -8,6 +9,9 @@ import Signupuser from '../Schemas/Signupschema'
 import Profile from '../Schemas/Profile'
 import userAuthentication from '../middeware/jwtauthorization'
 import {ReqAuthType, UserType} from '../types/userType'
+import nodemailer from 'nodemailer'
+import {MAIL_SETTINGS} from './mailsetting'
+// import transporter from `${nodemailer.createTransport(MAIL_SETTINGS)}`;
 
 signrouter.post('/signup', async (req: Request, res: Response) => {
 	const {email, fullName, userName, password} = req.body
@@ -60,6 +64,8 @@ signrouter.post('/login', async (req: Request, res: Response) => {
 	const useForToken = {
 		username: user.userName,
 		id: user._id,
+		profilePicture:user.profilePicture,
+		isStorie:user.isStorie
 	}
 
 	const token = jwt.sign(useForToken, process.env.SECRET!, {
@@ -67,9 +73,11 @@ signrouter.post('/login', async (req: Request, res: Response) => {
 	})
 	res.status(200).send({
 		token,
-		username: user.fullName,
-		userfullname: user.userName,
+		username: user.userName,
+		userfullname: user.fullName,
 		id: user._id,
+		isStorie:user?.isStorie,
+		userProfilePicture:user?.profilePicture
 	})
 })
 
@@ -87,7 +95,7 @@ signrouter.get('/userprofile/i', userAuthentication, async (req: Request, res: R
 
 	try {
 		let user = await Signupuser.findById(decodedToken)
-		console.log('user', user)
+		
 		if (user) {
 			return res.status(200).json(user)
 		}
@@ -111,7 +119,10 @@ signrouter.get('/otherprofile/:id', async (req: Request, res: Response) => {
 signrouter.put('/follow/:id', userAuthentication, async (req: RequestAuthType, res: Response) => {
 	const {id} = req.params
 	let followingId = req['auth']?.userId
-	// console.log('request',req)
+	console.log('aryanid',id)
+	console.log('rakshitid',followingId)
+
+
 
 	try {
 		let follower = await Signupuser.findByIdAndUpdate(followingId, {$push: {following: id}}, {new: true})
@@ -146,4 +157,39 @@ signrouter.put('/unfollow/:id', userAuthentication, async (req: RequestAuthType,
 		res.status(400).json({error: err})
 	}
 })
+
+signrouter.post('/resetEmail/:email',userAuthentication,async(req,res)=>{
+	const {email}=req.params
+	const user = await User.findOne({"email":email})
+	if(!user){
+		return res.status(400).json({err:"Email Does not Exist"})
+	}
+	if(user){
+        // try {
+		// 	let info = await transporter.sendMail({
+		// 	  from: MAIL_SETTINGS.auth.user,
+		// 	  to: params.to, // list of receivers
+		// 	  subject: 'Hello ✔', // Subject line
+		// 	  html: `
+		// 	  <div
+		// 		class="container"
+		// 		style="max-width: 90%; margin: auto; padding-top: 20px"
+		// 	  >
+		// 		<h2>Welcome to the club.</h2>
+		// 		<h4>You are officially In ✔</h4>
+		// 		<p style="margin-bottom: 30px;">Pleas enter the sign up OTP to get started</p>
+		// 		<h1 style="font-size: 40px; letter-spacing: 2px; text-align:center;">${params.OTP}</h1>
+		// 		<p style="margin-top:50px;">If you do not request for verification please do not respond to the mail. You can in turn un subscribe to the mailing list and we will never bother you again.</p>
+		// 	  </div>
+		// 	`,
+		// 	});
+		// 	return info;
+		//   } catch (error) {
+		// 	console.log(error);
+		// 	return false;
+		//   }
+	}
+
+})
+
 export default signrouter

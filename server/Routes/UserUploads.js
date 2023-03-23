@@ -66,7 +66,12 @@ useruploadsrouter.post('/single', upload.single('image'), (req, res) => __awaite
     }
 }));
 useruploadsrouter.get('/userpost', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let uploads = yield UserUploadSchema_1.default.find().populate('userId', 'userName profilePicture').populate("comment.postedBy");
+    let uploads = yield UserUploadSchema_1.default.find()
+        .populate('userId', 'userName profilePicture')
+        .populate("comment.postedBy")
+        .populate("likedBy")
+        .populate("comment.replies.postedBy");
+    // 
     console.log(uploads);
     //    .populate('commentedBy')
     //    .exec()
@@ -138,6 +143,121 @@ useruploadsrouter.put('/addcomment/:id', jwtauthorization_1.default, (req, res) 
     }
     catch (err) {
         res.status(400).json({ error: err });
+    }
+}));
+useruploadsrouter.put('/addcommentreply/:id', jwtauthorization_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _e;
+    const { id } = req.params;
+    console.log(id);
+    let userId = (_e = req['auth']) === null || _e === void 0 ? void 0 : _e.userId;
+    console.log(userId);
+    const { comment, postId } = req.body;
+    console.log('BBBB', comment);
+    const generateMongoObjectId = () => {
+        const thousand = 1000;
+        const sixteen = 16;
+        const timestamp = ((new Date().getTime() / thousand) | 0).toString(sixteen);
+        return (timestamp +
+            "xxxxxxxxxxxxxxxx"
+                .replace(/[x]/g, function () {
+                return ((Math.random() * sixteen) | 0).toString(sixteen);
+            })
+                .toLowerCase());
+    };
+    let uniqueId = generateMongoObjectId();
+    let commentreplies = {
+        reply: comment,
+        postedBy: userId,
+        id: uniqueId
+    };
+    try {
+        let posted = yield UserUploadSchema_1.default.updateOne({
+            id: postId,
+            "comment._id": id
+        }, {
+            $push: {
+                "comment.$.replies": commentreplies
+            }
+        }, { new: true });
+        // .populate('comment.postedBy', '_id userName profilePicture')
+        console.log('post', posted);
+        return res.status(200).json(posted);
+    }
+    catch (err) {
+        return res.status(400).json({ error: err });
+    }
+}));
+useruploadsrouter.delete('/deleteComment/:id', jwtauthorization_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _f;
+    const { id } = req.params;
+    const { postId } = req.query;
+    console.log('id', id);
+    let userId = (_f = req['auth']) === null || _f === void 0 ? void 0 : _f.userId;
+    console.log('userId', userId);
+    console.log('postId', postId);
+    try {
+        let deleted = yield UserUploadSchema_1.default.updateOne({
+            "_id": postId
+        }, {
+            $pull: {
+                "comment": {
+                    "_id": id
+                }
+            }
+        });
+        console.log(deleted);
+        return res.status(204).json(deleted);
+    }
+    catch (err) {
+        return res.status(404).json({ error: err });
+    }
+}));
+useruploadsrouter.delete('/deleteCommentReply/:id', jwtauthorization_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _g;
+    const { id } = req.params;
+    const { postId } = req.query;
+    console.log('id', id);
+    let userId = (_g = req['auth']) === null || _g === void 0 ? void 0 : _g.userId;
+    console.log('userId', userId);
+    console.log('postId', postId);
+    try {
+        let deleted = yield UserUploadSchema_1.default.findOneAndUpdate({ 'comment': { $elemMatch: { 'replies.id': id } } }, { $pull: { 'comment.$.replies': { id: id } } });
+        console.log(deleted);
+        return res.status(204).json(deleted);
+    }
+    catch (err) {
+        return res.status(404).json({ error: err });
+    }
+}));
+useruploadsrouter.get('/userPosts', jwtauthorization_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _h;
+    let userId = (_h = req['auth']) === null || _h === void 0 ? void 0 : _h.userId;
+    let uploads = yield UserUploadSchema_1.default.find({ "userId": userId })
+        .populate('userId', 'userName profilePicture')
+        .populate("comment.postedBy")
+        .populate("likedBy")
+        .populate("comment.replies.postedBy");
+    // 
+    console.log(uploads);
+    //    .populate('commentedBy')
+    //    .exec()
+    // let profileImage = await UserUploads.aggregate([
+    //     {$lookup:{
+    //     from:'userprofilepicture',
+    //     localField:'userId',
+    //     foreignField:'userId',
+    //     as:'anything'
+    // }}])
+    // console.log(profileImage)
+    //    .populate()
+    //    .populate('profilePicture','image')
+    // let userId = await UserProfilePicture.findById()
+    if (uploads) {
+        console.log(uploads);
+        res.json(uploads).status(200);
+    }
+    else {
+        res.status(400).json('error');
     }
 }));
 exports.default = useruploadsrouter;

@@ -92,18 +92,19 @@ profilerouter.put('/profileimage', upload.single('image'), (req, res) => __await
         res.status(400).json({ err });
     }
 }));
-// profilerouter.get('/profileimage',userAuthentication, async (req,res)=>{
-//    console.log(req.auth.userId)
-//    let id = req.auth.userId
-//   const profilePicture = await UserProfilePicture.find({userId:`${id}`})
-//   const profileImage = profilePicture[profilePicture.length-1];
-//   // console.log(profilePicture);
-//   try{
-//     res.status(200).json(profileImage).end()
-//   }
-//   catch(err){
-//     console.log(err)
-//     res.status(400).json(err)
-//    }
-// })
+profilerouter.get('/searchUser', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { search } = req.query;
+    console.log(search);
+    if (!search) {
+        return res.status(400).json({ err: 'No Search Found' });
+    }
+    try {
+        let searchResults = yield Signupschema_1.default.find({ "userName": { $regex: ".*" + search + ".*", $options: "i" } });
+        console.log(searchResults);
+        return res.status(200).json(searchResults);
+    }
+    catch (err) {
+        return res.status(400).json({ err: 'No User Found' });
+    }
+}));
 exports.default = profilerouter;

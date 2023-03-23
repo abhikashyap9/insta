@@ -45,7 +45,7 @@ const Signupuser = new mongoose_1.default.Schema({
     ],
     isStorie: {
         type: Boolean,
-        // default: false,
+        default: false,
     },
 });
 // const UserUploads=new mongoose.Schema({

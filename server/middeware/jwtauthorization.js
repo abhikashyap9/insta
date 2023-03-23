@@ -13,9 +13,9 @@ const getTokenFrom = (request) => {
 };
 const userAuthentication = (req, res, next) => {
     const token = getTokenFrom(req);
-    // console.log(token)
+    console.log(token);
     const decodedToken = jsonwebtoken_1.default.verify(token, process.env.SECRET);
-    // console.log('decoded', decodedToken)
+    console.log('decoded', decodedToken);
     if (!decodedToken.id) {
         return res.status(401).json({ error: 'token missing or invalid token' });
     }

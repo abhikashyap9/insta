@@ -41,7 +41,7 @@ const Signupuser = new mongoose.Schema({
 	],
 	isStorie: {
 		type: Boolean,
-		// default: false,
+		default: false,
 	},
 })
 // const UserUploads=new mongoose.Schema({
