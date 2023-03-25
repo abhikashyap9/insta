@@ -114,6 +114,9 @@ const Profile = new mongoose_1.default.Schema({
     posts: {
         type: Map,
     },
+    token: {
+        type: String,
+    },
     requests: [
         {
             type: mongoose_1.default.Schema.Types.ObjectId,

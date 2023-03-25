@@ -114,6 +114,9 @@ const Profile = new mongoose.Schema({
 	posts: {
 		type: Map,
 	},
+	token: {
+		type: String,
+	},
 	requests: [
 		{
 			type: mongoose.Schema.Types.ObjectId,

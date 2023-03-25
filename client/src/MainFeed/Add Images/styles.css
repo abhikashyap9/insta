@@ -1,4 +1,6 @@
-#app { height: 100% }
+#app {
+  height: 100%;
+}
 html,
 body {
   position: relative;
@@ -44,4 +46,27 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+.side_screen_add_images {
+  flex-basis: 32%;
+}
+
+.carousel {
+  display: none;
+}
+@media (min-width: 960px) {
+  .carousel .control-dots {
+    /* bottom: 0; */
+    top: 50% !important;
+  }
+  .carousel .control-dots .dot {
+    /* bottom: 0; */
+    background: rgb(11, 205, 240) !important;
+  }
+}
+.control-arrow {
+  display: none;
+}
+.carousel.carousel-slider .control-arrow {
+  display: none;
 }

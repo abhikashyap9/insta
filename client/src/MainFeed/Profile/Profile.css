@@ -1,60 +1,57 @@
-.commentsModal{
-    margin: 0% auto !important;
-    width:60%;
-    height:100vh;
+.commentsModal {
+  margin: 0% auto !important;
+  width: 60%;
+  height: 100vh;
 }
-.scrollable{
-    max-height: 80vh;
-     overflow-y: auto;
-     padding:0px 40px !important;
-
-    
+.scrollable {
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 0px 40px !important;
 }
 
-.profile_image_modal{
-    overflow-y: initial;
-
+.profile_image_modal {
+  overflow-y: initial;
+}
+.saved_post {
+  top: 50%;
+  display: flex;
+  left: 40%;
 }
 
 @media only screen and (min-device-width: 320px) and (max-device-width: 480px) {
-    /* insert styles here */
-    .sidebar_profile{
-      flex-basis:0% !important;
-  
-    }
-
-    .main_profile{
-      flex-basis:100% !important;
-    }
-    .scrollable{
-      padding:0px 0px !important;
-
-    }
-}
-.sidebar_profile{
-  flex-basis:31%;
-
-}
-  .main_profile{
-    flex-basis:56%
+  /* insert styles here */
+  .sidebar_profile {
+    flex-basis: 0% !important;
   }
 
-  .circle_imageProfile{
-    clip-path: circle();
-    width: 65%;
-    height: 140px;
-    object-fit: cover;
+  .main_profile {
+    flex-basis: 100% !important;
   }
+  .scrollable {
+    padding: 0px 0px !important;
+  }
+}
+.sidebar_profile {
+  flex-basis: 31%;
+}
+.main_profile {
+  flex-basis: 56%;
+}
 
-  @media only screen and (min-device-width: 320px) and (max-device-width: 480px) {
-    .circle_imageProfile{ 
-      height: 62px !important;
-      border-radius: 50%;
+.circle_imageProfile {
+  clip-path: circle();
+  width: 65%;
+  height: 140px;
+  object-fit: cover;
+}
+
+@media only screen and (min-device-width: 320px) and (max-device-width: 480px) {
+  .circle_imageProfile {
+    height: 62px !important;
+    border-radius: 50%;
     clip-path: none !important;
-
-    }
-    .commentsModal{
-      width:100%;
   }
-
+  .commentsModal {
+    width: 100%;
   }
+}

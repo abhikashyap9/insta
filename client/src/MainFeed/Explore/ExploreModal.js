@@ -6,7 +6,7 @@ import DummyPic from '../../../src/image/dumyPic.svg.png'
 import { useEffect, useState } from 'react'
 import Posts from '../Feed/Posts'
 import AddPosts from '../../services/addpost.service'
-import './Profile.css'
+import '../Profile/Profile.css'
 import CommentsModal from '../Feed/CommentsModal'
 import LikesModal from '../Feed/LikesModal'
 import UserProfile from '../../services/userProfile.service.js'
@@ -22,10 +22,12 @@ const ModalContentInside = tw.div`flex flex-col o`
 const ModalContentBox = tw.div`border-gray-400 py-2 cursor-pointer flex justify-between px-4 items-center hover:bg-slate-100 rounded`
 const ModalContentBoxFlex = tw.div`flex items-center py-0.5 `
 
-function ProfileImaesModal(props) {
+function ExploreModal(props) {
   //   const { closeLikesModal, likesCounts, follow, unfollow, followCount } = props
-  const { userData, closeProfileModal } = props
+  const { closeProfileModal } = props
+
   const [like, setLike] = useState(0)
+  const [userData, setUserData] = useState([])
   const [isLikesModal, setIsLikesModal] = useState(false)
   const [isCommentsModal, setIsCommentsModal] = useState(false)
   const [commentValue, setCommentValue] = useState('')
@@ -50,7 +52,12 @@ function ProfileImaesModal(props) {
   let userId = localStorage.getItem('userid')
   let auth = localStorage.getItem('token')
   let username = localStorage.getItem('username')
-
+  useEffect(() => {
+    AddPosts.userUpload().then((res) => {
+      // console.log(res);
+      setUserData(res.data)
+    })
+  }, [])
   const handleLikeClicks = (e) => {
     let like = userData.find((curr) => curr.id === e)
     console.log(like)
@@ -287,4 +294,4 @@ function ProfileImaesModal(props) {
   )
 }
 
-export default ProfileImaesModal
+export default ExploreModal
