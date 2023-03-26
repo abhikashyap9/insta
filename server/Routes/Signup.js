@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.signrouter = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const otp_generator_1 = __importDefault(require("otp-generator"));
 const express_1 = __importDefault(require("express"));
 exports.signrouter = express_1.default.Router({
     strict: true,
@@ -21,6 +22,50 @@ exports.signrouter = express_1.default.Router({
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const Signupschema_1 = __importDefault(require("../Schemas/Signupschema"));
 const jwtauthorization_1 = __importDefault(require("../middeware/jwtauthorization"));
+const nodemailer_1 = __importDefault(require("nodemailer"));
+const config_1 = __importDefault(require("./config"));
+// import transporter from `${nodemailer.createTransport(MAIL_SETTINGS)}`;
+// export interface configType {
+// 	secret_jwt?: String
+// 	emailUser?: String
+// 	emailPassword?: String
+// }
+// export type ReqAuthType = {auth: {userId: string}}
+const sendResetPasswordMail = (name, email, token) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        let transporter = nodemailer_1.default.createTransport({
+            host: 'smtp.gmail.com',
+            port: 465,
+            secure: true,
+            // requireTLS: true,
+            auth: {
+                user: config_1.default.emailUser,
+                pass: config_1.default.emailPassword, // generated ethereal password
+            },
+        });
+        let info = yield transporter.sendMail({
+            from: 'config.emailUser',
+            to: email,
+            subject: 'For Reset Password',
+            text: 'Hello world?',
+            html: '<b>Hello world?</b>' + name + 'Please copy the link and reset password', // html body
+        });
+        transporter.sendMail(info, function (err, info) {
+            if (err) {
+                console.log(err);
+            }
+            else {
+                console.log('Mail has sended');
+            }
+        });
+    }
+    catch (err) {
+        console.log(err);
+    }
+    // catch(err:any)=>{
+    // // console.log(err)
+    // }
+});
 exports.signrouter.post('/signup', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, fullName, userName, password } = req.body;
     console.log('reqBody', req.body);
@@ -64,7 +109,7 @@ exports.signrouter.post('/login', (req, res) => __awaiter(void 0, void 0, void 0
         username: user.userName,
         id: user._id,
         profilePicture: user.profilePicture,
-        isStorie: user.isStorie
+        isStorie: user.isStorie,
     };
     const token = jsonwebtoken_1.default.sign(useForToken, process.env.SECRET, {
         expiresIn: 600 * 600,
@@ -75,7 +120,7 @@ exports.signrouter.post('/login', (req, res) => __awaiter(void 0, void 0, void 0
         userfullname: user.fullName,
         id: user._id,
         isStorie: user === null || user === void 0 ? void 0 : user.isStorie,
-        userProfilePicture: user === null || user === void 0 ? void 0 : user.profilePicture
+        userProfilePicture: user === null || user === void 0 ? void 0 : user.profilePicture,
     });
 }));
 const getTokenFrom = (request) => {
@@ -145,6 +190,27 @@ exports.signrouter.put('/unfollow/:id', jwtauthorization_1.default, (req, res) =
     catch (err) {
         console.log(err);
         res.status(400).json({ error: err });
+    }
+}));
+exports.signrouter.get('/resetEmail/:email', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { email } = req.params;
+    console.log(email);
+    const user = yield Signupschema_1.default.findOne({ email: email });
+    if (!user) {
+        return res.status(400).json({ err: 'Email Does not Exist' });
+    }
+    if (user) {
+        let otp = otp_generator_1.default.generate(6, { upperCaseAlphabets: false, specialChars: false });
+        console.log(otp);
+        try {
+            const user = yield Signupschema_1.default.findOneAndUpdate({ email: email }, { $set: { token: otp } });
+            sendResetPasswordMail(user === null || user === void 0 ? void 0 : user.userName, user === null || user === void 0 ? void 0 : user.email, user === null || user === void 0 ? void 0 : user.password);
+            res.status(200).send({ success: true, msg: 'Please Check your inbox' });
+        }
+        catch (err) {
+            console.log(err);
+            res.status(400).send({ success: false, msg: 'Request Failed' });
+        }
     }
 }));
 exports.default = exports.signrouter;

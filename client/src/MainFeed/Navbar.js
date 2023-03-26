@@ -1,9 +1,12 @@
 import { React,useState } from 'react'
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import tw from 'tailwind-styled-components'
 import '../App.css'
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import { useNavigate } from 'react-router-dom'
 
 import { useSelector } from "react-redux";
+import { Logout } from '@mui/icons-material';
 
 
 
@@ -41,8 +44,11 @@ basis-1/4 cursor-pointer text-center`
 function Navbar(props) {
    const { instaLogo,searchBar,profile,setProfile,profileImage,newDiv } = props;
    const [colorChange, setColorchange] = useState(false);
+   const [logout,setLogout]=useState(false)
    const currentUser=useSelector((state)=>state.userData)
    const {userName,userProfilePicture} = currentUser
+  const navigate = useNavigate()
+
   
    const changeNavbarColor = () =>{
      if(window.scrollY >= 60){
@@ -52,6 +58,11 @@ function Navbar(props) {
        setColorchange(false);
      }
   };
+
+  const Logout=()=>{
+    navigate('/LoginAuth')
+    localStorage.clear()
+  }
   window.addEventListener('scroll', changeNavbarColor);
     return (
     <>
@@ -80,6 +91,13 @@ function Navbar(props) {
             </div>
 
             <div className='text-base ml-2'><p >{userName}</p></div>
+            <ArrowDropDownIcon onClick={()=>setLogout(prev=>!prev)}/>
+            {logout && <div className='relative'>
+              <div className='w-14 h-8 bg-cyan-50 absolute border rounded logout_button' onClick={Logout}>
+                <p className='p-0.5'>Logout</p>
+              </div>
+            </div>}
+            
             </div>
 
             </NavPart3>

@@ -5,4 +5,5 @@ export interface UserType {
 	password?: String
 	id?: String
 }
-export type ReqAuthType = { auth: { userId: string } }
+
+export type ReqAuthType = {auth: {userId: string}}

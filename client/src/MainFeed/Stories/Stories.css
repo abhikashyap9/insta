@@ -1,4 +1,8 @@
-.add_stories{
-    top: 67%;
-    right: -10%;
+.add_stories {
+  top: 67%;
+  right: -10%;
+}
+
+.add_images {
+  flex-basis: 32%;
 }

@@ -227,3 +227,7 @@ border:0px; */
   border-radius: 1em;
   padding: 1em;
 }
+.logout_button{
+  right: -17px;
+    top: 11px;
+}
