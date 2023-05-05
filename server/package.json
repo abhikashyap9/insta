@@ -42,7 +42,7 @@
     "node-fetch": "^2.6.7",
     "nodemailer": "^6.9.1",
     "otp-generator": "^4.0.1",
-    "socket.io": "^4.5.4"
+    "socket.io": "^4.6.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
