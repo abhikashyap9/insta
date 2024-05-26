@@ -1,7 +1,7 @@
 import express, {Request, Response} from 'express'
 import multer from 'multer'
-import UserVideos from '../Schemas/UserVideosSchema'
-import Signupuser from '../Schemas/Signupschema'
+import UserVideos from '../Models/UserVideosSchema'
+import Signupuser from '../Models/Signupschema'
 const EventEmitter = require('events')
 const eventEmitter = new EventEmitter()
 const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path

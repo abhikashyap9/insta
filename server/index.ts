@@ -12,13 +12,12 @@ const io = new Server(server, {
     methods: ["GET", "POST"],
   },
 });
-console.log("ax", server);
 
 async function main() {
   await initMongodb.connect();
 
   server.listen(config.PORT, () => {
-    logger.info(`Server rununing on port ${config.PORT}`);
+    logger.info(`Server running on port ${config.PORT}`);
   });
 }
 main();
@@ -31,7 +30,7 @@ io.on("connection", (socket: any) => {
   });
   socket.on('typing', (room:any) => {
     socket.to(room).emit("typing",room);
-    console.log('typing')
+    // console.log('typing')
   });
   socket.on('stoptyping', (room:any) => {
     socket.to(room).emit("stoptyping",room);
@@ -48,23 +47,37 @@ io.on("connection", (socket: any) => {
   // socket.on('disconnect',()=>{
   //    console.log(`${socket.id} has disconnected`)
   // })
+  // socket.on('sdp',(data:any)=>{
+  //   console.log(data)
+  //   socket.to(data).emit("sdp",data)
+  // })
   socket.on('sdp',(data:any)=>{
-    console.log(data)
+    // console.log(data)
     socket.broadcast.emit('sdp',data)
   })
 
   socket.on('candidate',(data:any)=>{
+    console.log(data)
     socket.broadcast.emit('candidate',data)
   })
 
   socket.on("ping", (data: any) => {
-    console.log("data", data);
+    console.log("data", data.room);
     socket.to(data.room).emit("receive_message", data);
     console.log(data);
   });
+  socket.on("join_rooms",(room:any)=>{
+    console.log('joinRoom',room);
+    socket.join(room);
+    socket.to(room).emit("join", "User joined the room");
+  })
 
+
+  
   socket.on("disconnect", () => {
     console.log("User Disconnected", socket.id);
     socket.broadcast.emit("callEnded")
   });
+
+  
 });

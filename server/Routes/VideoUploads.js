@@ -14,8 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const multer_1 = __importDefault(require("multer"));
-const UserVideosSchema_1 = __importDefault(require("../Schemas/UserVideosSchema"));
-const Signupschema_1 = __importDefault(require("../Schemas/Signupschema"));
+const UserVideosSchema_1 = __importDefault(require("../Models/UserVideosSchema"));
+const Signupschema_1 = __importDefault(require("../Models/Signupschema"));
 const EventEmitter = require('events');
 const eventEmitter = new EventEmitter();
 const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;

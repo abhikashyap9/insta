@@ -165,4 +165,7 @@ padding: 7px 8px 5px !important;
     flex-basis:56%
   }
  
+  .message_feed{
+    flex-basis:25%
+  }
 

@@ -18,8 +18,8 @@ exports.conversationRouter = express_1.default.Router({
     strict: true,
 });
 const jwtauthorization_1 = __importDefault(require("../middeware/jwtauthorization"));
-const ConversationSchema_1 = __importDefault(require("../Schemas/ConversationSchema"));
-const Signupschema_1 = __importDefault(require("../Schemas/Signupschema"));
+const ConversationSchema_1 = __importDefault(require("../Models/ConversationSchema"));
+const Signupschema_1 = __importDefault(require("../Models/Signupschema"));
 exports.conversationRouter.post("/createConversation/:id", jwtauthorization_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const { id } = req.params; //otheruser
@@ -172,7 +172,7 @@ exports.conversationRouter.post("/savedMessages/:id", jwtauthorization_1.default
 exports.conversationRouter.get("/getMessages/:id", jwtauthorization_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     try {
-        let conversation = yield ConversationSchema_1.default.findById(id);
+        let conversation = yield ConversationSchema_1.default.findById(id).populate("userId");
         res.status(200).json(conversation);
     }
     catch (err) {

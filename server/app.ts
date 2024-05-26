@@ -39,7 +39,7 @@ app.use(middleware.errorHandler)
 app.use(morgan('combined', { stream: accessLogStream }))
 // app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use('', signrouter)
+app.use('/', signrouter)
 app.use('', profilerouter)
 app.use('', UserUploads)
 app.use('',conversationRouter)

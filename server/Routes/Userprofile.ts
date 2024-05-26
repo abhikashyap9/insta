@@ -1,11 +1,11 @@
 import express, {Request, Response} from 'express'
-import UserProfilePicture from '../Schemas/UserProfilePictureSchema'
+import UserProfilePicture from '../Models/UserProfilePictureSchema'
 import multer from 'multer'
 import jwt from 'jsonwebtoken'
 import userAuthentication from '../middeware/jwtauthorization'
-import ProfileDetails from '../Schemas/ProfileDetailSchema'
-import Profile from '../Schemas/Profile'
-import Signupuser from '../Schemas/Signupschema'
+import ProfileDetails from '../Models/ProfileDetailSchema'
+import Profile from '../Models/Profile'
+import Signupuser from '../Models/Signupschema'
 import {UserType} from '../types/userType'
 const profilerouter = express.Router({
 	strict: true,

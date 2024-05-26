@@ -34,7 +34,7 @@ app.use(middleware_1.default.requestLogger);
 app.use(middleware_1.default.errorHandler);
 app.use((0, morgan_1.default)('combined', { stream: accessLogStream }));
 // app.use(bodyParser.urlencoded({ extended: true }));
-app.use('', Signup_1.default);
+app.use('/', Signup_1.default);
 app.use('', Userprofile_1.default);
 app.use('', UserUploads_1.default);
 app.use('', Conversation_1.default);
