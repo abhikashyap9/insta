@@ -16,9 +16,9 @@ const express_1 = __importDefault(require("express"));
 const multer_1 = __importDefault(require("multer"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const jwtauthorization_1 = __importDefault(require("../middeware/jwtauthorization"));
-const ProfileDetailSchema_1 = __importDefault(require("../Schemas/ProfileDetailSchema"));
-const Profile_1 = __importDefault(require("../Schemas/Profile"));
-const Signupschema_1 = __importDefault(require("../Schemas/Signupschema"));
+const ProfileDetailSchema_1 = __importDefault(require("../Models/ProfileDetailSchema"));
+const Profile_1 = __importDefault(require("../Models/Profile"));
+const Signupschema_1 = __importDefault(require("../Models/Signupschema"));
 const profilerouter = express_1.default.Router({
     strict: true,
 });

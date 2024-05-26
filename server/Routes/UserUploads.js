@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const express_1 = __importDefault(require("express"));
 const multer_1 = __importDefault(require("multer"));
-const UserUploadSchema_1 = __importDefault(require("../Schemas/UserUploadSchema"));
+const UserUploadSchema_1 = __importDefault(require("../Models/UserUploadSchema"));
 const jwtauthorization_1 = __importDefault(require("../middeware/jwtauthorization"));
 const useruploadsrouter = express_1.default.Router({
     strict: true,
@@ -233,6 +233,36 @@ useruploadsrouter.get('/userPosts', jwtauthorization_1.default, (req, res) => __
     var _h;
     let userId = (_h = req['auth']) === null || _h === void 0 ? void 0 : _h.userId;
     let uploads = yield UserUploadSchema_1.default.find({ "userId": userId })
+        .populate('userId', 'userName profilePicture')
+        .populate("comment.postedBy")
+        .populate("likedBy")
+        .populate("comment.replies.postedBy");
+    // 
+    console.log(uploads);
+    //    .populate('commentedBy')
+    //    .exec()
+    // let profileImage = await UserUploads.aggregate([
+    //     {$lookup:{
+    //     from:'userprofilepicture',
+    //     localField:'userId',
+    //     foreignField:'userId',
+    //     as:'anything'
+    // }}])
+    // console.log(profileImage)
+    //    .populate()
+    //    .populate('profilePicture','image')
+    // let userId = await UserProfilePicture.findById()
+    if (uploads) {
+        console.log(uploads);
+        res.json(uploads).status(200);
+    }
+    else {
+        res.status(400).json('error');
+    }
+}));
+useruploadsrouter.get('/otherUsersPosts/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let { id } = req.params;
+    let uploads = yield UserUploadSchema_1.default.find({ "userId": id })
         .populate('userId', 'userName profilePicture')
         .populate("comment.postedBy")
         .populate("likedBy")

@@ -1,29 +1,14 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.signrouter = void 0;
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const otp_generator_1 = __importDefault(require("otp-generator"));
 const express_1 = __importDefault(require("express"));
-exports.signrouter = express_1.default.Router({
+const signrouter = express_1.default.Router({
     strict: true,
 });
-const bcrypt_1 = __importDefault(require("bcrypt"));
-const Signupschema_1 = __importDefault(require("../Schemas/Signupschema"));
+const SignupRoutes_1 = require("../Controller/SignupRoutes");
 const jwtauthorization_1 = __importDefault(require("../middeware/jwtauthorization"));
-const nodemailer_1 = __importDefault(require("nodemailer"));
-const config_1 = __importDefault(require("./config"));
 // import transporter from `${nodemailer.createTransport(MAIL_SETTINGS)}`;
 // export interface configType {
 // 	secret_jwt?: String
@@ -31,186 +16,112 @@ const config_1 = __importDefault(require("./config"));
 // 	emailPassword?: String
 // }
 // export type ReqAuthType = {auth: {userId: string}}
-const sendResetPasswordMail = (name, email, token) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        let transporter = nodemailer_1.default.createTransport({
-            host: 'smtp.gmail.com',
-            port: 465,
-            secure: true,
-            // requireTLS: true,
-            auth: {
-                user: config_1.default.emailUser,
-                pass: config_1.default.emailPassword, // generated ethereal password
-            },
-        });
-        let info = yield transporter.sendMail({
-            from: 'config.emailUser',
-            to: email,
-            subject: 'For Reset Password',
-            text: 'Hello world?',
-            html: '<b>Hello world?</b>' + name + 'Please copy the link and reset password', // html body
-        });
-        transporter.sendMail(info, function (err, info) {
-            if (err) {
-                console.log(err);
-            }
-            else {
-                console.log('Mail has sended');
-            }
-        });
-    }
-    catch (err) {
-        console.log(err);
-    }
-    // catch(err:any)=>{
-    // // console.log(err)
-    // }
-});
-exports.signrouter.post('/signup', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email, fullName, userName, password } = req.body;
-    console.log('reqBody', req.body);
-    const userEmailExist = yield Signupschema_1.default.findOne({ email });
-    const userNameExist = yield Signupschema_1.default.findOne({ fullName });
-    console.log(userEmailExist);
-    console.log(userNameExist);
-    if (userEmailExist) {
-        return res.status(409).json({ error: 'User Email Already Exist' });
-    }
-    if (userNameExist) {
-        return res.status(409).json({ error: 'User Name Already Exist' });
-    }
-    const saltRounds = 10;
-    const hashedPassword = yield bcrypt_1.default.hash(password, saltRounds);
-    const signupuser = new Signupschema_1.default({
-        email: email,
-        fullName: fullName,
-        userName: userName,
-        password: hashedPassword,
-    });
-    try {
-        let savedUser = yield signupuser.save();
-        res.status(201).json(savedUser).end();
-    }
-    catch (err) {
-        res.status(400).send(err);
-    }
-}));
-exports.signrouter.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email, password } = req.body;
-    console.log('req', req.body);
-    const user = yield Signupschema_1.default.findOne({ email });
-    console.log('user', user);
-    const passwordCorrect = yield bcrypt_1.default.compare(password, user === null || user === void 0 ? void 0 : user.password);
-    console.log(passwordCorrect);
-    if (!(user && passwordCorrect)) {
-        return res.status(401).json({ error: 'Invalid Password' });
-    }
-    const useForToken = {
-        username: user.userName,
-        id: user._id,
-        profilePicture: user.profilePicture,
-        isStorie: user.isStorie,
-    };
-    const token = jsonwebtoken_1.default.sign(useForToken, process.env.SECRET, {
-        expiresIn: 600 * 600,
-    });
-    res.status(200).send({
-        token,
-        username: user.userName,
-        userfullname: user.fullName,
-        id: user._id,
-        isStorie: user === null || user === void 0 ? void 0 : user.isStorie,
-        userProfilePicture: user === null || user === void 0 ? void 0 : user.profilePicture,
-    });
-}));
-const getTokenFrom = (request) => {
-    const authorization = request.get('authorization');
-    if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
-        return authorization.split(' ')[1];
-    }
-    return null;
-};
-exports.signrouter.get('/userprofile/i', jwtauthorization_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    let decodedToken = (_a = req['auth']) === null || _a === void 0 ? void 0 : _a.userId;
-    try {
-        let user = yield Signupschema_1.default.findById(decodedToken);
-        if (user) {
-            return res.status(200).json(user);
-        }
-    }
-    catch (err) {
-        // console.log(''merr);
-        res.status(400).json({ err: err });
-    }
-}));
-exports.signrouter.get('/otherprofile/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id } = req.params;
-    console.log('id', id);
-    try {
-        let user = yield Signupschema_1.default.findById(id);
-        res.status(200).json(user).end();
-    }
-    catch (err) {
-        res.status(400).json({ error: err });
-    }
-}));
-exports.signrouter.put('/follow/:id', jwtauthorization_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _b;
-    const { id } = req.params;
-    let followingId = (_b = req['auth']) === null || _b === void 0 ? void 0 : _b.userId;
-    console.log('aryanid', id);
-    console.log('rakshitid', followingId);
-    try {
-        let follower = yield Signupschema_1.default.findByIdAndUpdate(followingId, { $push: { following: id } }, { new: true });
-        let following = yield Signupschema_1.default.findByIdAndUpdate(id, { $push: { followers: followingId } }, { new: true });
-        res.status(201).json(follower).end();
-    }
-    catch (err) {
-        console.log(err);
-        res.status(400).json({ error: err });
-    }
-}));
-//   declare module "express" {
-// 	export interface Request {
-// 	  auth: any
+signrouter.post('/signup', SignupRoutes_1.SignUpRoutes.Signup);
+signrouter.post('/login', SignupRoutes_1.SignUpRoutes.Login);
+signrouter.get('/userprofile', SignupRoutes_1.SignUpRoutes.UserProfile);
+signrouter.get('/otherprofile/:id', SignupRoutes_1.SignUpRoutes.OtherProfile);
+signrouter.put('/follow/:id', jwtauthorization_1.default, SignupRoutes_1.SignUpRoutes.FollowUser);
+signrouter.put('/unfollow/:id', jwtauthorization_1.default, SignupRoutes_1.SignUpRoutes.UnfollowUser);
+signrouter.post('/resetPassword', SignupRoutes_1.SignUpRoutes.ResetEmail);
+signrouter.get('/resetEmail/:email', SignupRoutes_1.SignUpRoutes.ResetPassowrd);
+// signrouter.get('/userprofile/i', userAuthentication, async (req: Request, res: Response) => {
+// })
+// signrouter.get('/otherprofile/:id', async (req: Request, res: Response) => {
+// 	const {id} = req.params
+// 	console.log('id', id)
+// 	try {
+// 		let user = await Signupuser.findById(id)
+// 		res.status(200).json(user).end()
+// 	} catch (err) {
+// 		res.status(400).json({error: err})
 // 	}
-//   }
-exports.signrouter.put('/unfollow/:id', jwtauthorization_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _c;
-    const { id } = req.params;
-    let followingId = (_c = req['auth']) === null || _c === void 0 ? void 0 : _c.userId;
-    try {
-        let follower = yield Signupschema_1.default.findByIdAndUpdate(followingId, { $pull: { following: id } }, { new: true });
-        let following = yield Signupschema_1.default.findByIdAndUpdate(id, { $pull: { followers: followingId } }, { new: true });
-        res.status(201).json(follower).end();
-        console.log('follower', follower);
-        console.log('following', following);
-    }
-    catch (err) {
-        console.log(err);
-        res.status(400).json({ error: err });
-    }
-}));
-exports.signrouter.get('/resetEmail/:email', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email } = req.params;
-    console.log(email);
-    const user = yield Signupschema_1.default.findOne({ email: email });
-    if (!user) {
-        return res.status(400).json({ err: 'Email Does not Exist' });
-    }
-    if (user) {
-        let otp = otp_generator_1.default.generate(6, { upperCaseAlphabets: false, specialChars: false });
-        console.log(otp);
-        try {
-            const user = yield Signupschema_1.default.findOneAndUpdate({ email: email }, { $set: { token: otp } });
-            sendResetPasswordMail(user === null || user === void 0 ? void 0 : user.userName, user === null || user === void 0 ? void 0 : user.email, user === null || user === void 0 ? void 0 : user.password);
-            res.status(200).send({ success: true, msg: 'Please Check your inbox' });
-        }
-        catch (err) {
-            console.log(err);
-            res.status(400).send({ success: false, msg: 'Request Failed' });
-        }
-    }
-}));
-exports.default = exports.signrouter;
+// })
+// signrouter.put('/follow/:id', userAuthentication, async (req: RequestAuthType, res: Response) => {
+// 	const {id} = req.params
+// 	let followingId = req['auth']?.userId
+// 	console.log('aryanid', id)
+// 	console.log('rakshitid', followingId)
+// 	try {
+// 		let follower = await Signupuser.findByIdAndUpdate(followingId, {$push: {following: id}}, {new: true})
+// 		let following = await Signupuser.findByIdAndUpdate(id, {$push: {followers: followingId}}, {new: true})
+// 		res.status(201).json(follower).end()
+// 	} catch (err) {
+// 		console.log(err)
+// 		res.status(400).json({error: err})
+// 	}
+// })
+// export interface RequestAuthType extends Request {
+// 	auth?: {userId?: string}
+// }
+// //   declare module "express" {
+// // 	export interface Request {
+// // 	  auth: any
+// // 	}
+// //   }
+// signrouter.put('/unfollow/:id', userAuthentication, async (req: RequestAuthType, res: Response) => {
+// 	const {id} = req.params
+// 	let followingId = req['auth']?.userId
+// 	try {
+// 		let follower = await Signupuser.findByIdAndUpdate(followingId, {$pull: {following: id}}, {new: true})
+// 		let following = await Signupuser.findByIdAndUpdate(id, {$pull: {followers: followingId}}, {new: true})
+// 		res.status(201).json(follower).end()
+// 		console.log('follower', follower)
+// 		console.log('following', following)
+// 	} catch (err) {
+// 		console.log(err)
+// 		res.status(400).json({error: err})
+// 	}
+// })
+// signrouter.post('/resetPassword',async(req:any,res:any)=>{
+// 	const token=req.query.token;
+// 		console.log(token)
+// 		const tokenData=await Signupuser.findOne({password:token})
+// 		console.log(tokenData)
+// 		const {password}=req.body
+// 		console.log(password)
+// 		console.log('password',req)
+// 	try{
+// 		if(tokenData){
+// 			const saltRounds = 10
+// 			const hashedPassword = await bcrypt.hash(password, saltRounds)
+// 			const userData=await Signupuser.findByIdAndUpdate({_id:tokenData?._id},{$set:{password:hashedPassword,token:''}},{new:true})
+// 			console.log(userData)
+// 			return res.status(200).send({success:true,msg:"User Password has been reset"})
+// 		}
+// 		else{
+// 		return res.status(400).send({success:false,msg:"The link has been expired"})
+// 		}
+// 	}
+// 	catch(err){
+// 		return res.status(400).send({err})
+// 	}
+// })
+// signrouter.get('/resetEmail/:email', async (req, res) => {
+// 	const {email} = req.params
+// 	console.log('EMail',email)
+// 	const user = await Signupuser.findOne({email: email})
+// 	if (!user) {
+// 		return res.status(400).json({err: 'Email Does not Exist'})
+// 	}
+// 	if (user) {
+// 		let otp = otpGenerator.generate(6, {upperCaseAlphabets: false, specialChars: false})
+// 		console.log(typeof otp)
+// 		try {
+// 			const user = await Signupuser.findOneAndUpdate({
+// 				"email":email 
+// 			  },
+// 			  {
+// 				"$set": {
+// 				  "token": otp
+// 				}
+// 			  })
+// 			console.log(user)
+// 			sendResetPasswordMail(user?.userName, user?.email, user?.password)
+// 			res.status(200).send({success: true, msg: 'Please Check your inbox',data:user})
+// 		} catch (err) {
+// 			console.log(err)
+// 			res.status(400).send({success: false, msg: 'Request Failed'})
+// 		}
+// 	}
+// })
+exports.default = signrouter;

@@ -2,3 +2,16 @@
     width:17% !important;
     min-height: 185px !important;
 }
+.wrong_password_header:hover{
+    transition: 200ms;
+}
+.wrong_password_header:hover{
+background-color:rgb(161, 160, 160) ;
+color:white;
+outline: none;
+border:none;
+/* transition-delay: 0.1s; */
+/* transform: translateY(5px) */
+
+}
+

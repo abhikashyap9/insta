@@ -4,8 +4,8 @@ export const conversationRouter = express.Router({
   strict: true,
 });
 import userAuthentication from "../middeware/jwtauthorization";
-import Conversation from "../Schemas/ConversationSchema";
-import Signupuser from "../Schemas/Signupschema";
+import Conversation from "../Models/ConversationSchema";
+import Signupuser from "../Models/Signupschema";
 export interface RequestAuthType extends Request {
   auth?: { userId?: string };
 }
@@ -197,7 +197,7 @@ conversationRouter.get(
   async (req: any, res: Response) => {
     const { id } = req.params;
     try {
-      let conversation = await Conversation.findById(id);
+      let conversation = await Conversation.findById(id).populate("userId");
       res.status(200).json(conversation);
     } catch (err) {
       console.log(err);

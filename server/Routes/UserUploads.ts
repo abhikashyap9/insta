@@ -1,11 +1,11 @@
 import jwt from 'jsonwebtoken'
 import express, { Request, Response } from 'express'
 import multer from 'multer'
-import UserUploads from '../Schemas/UserUploadSchema'
-import CommentReplies from '../Schemas/RepliesSchema'
+import UserUploads from '../Models/UserUploadSchema'
+import CommentReplies from '../Models/RepliesSchema'
 
 
-import UserVideo from '../Schemas/UserVideosSchema'
+import UserVideo from '../Models/UserVideosSchema'
 
 import userAuthentication from '../middeware/jwtauthorization'
 import { UserType } from '../types/userType'
@@ -256,6 +256,38 @@ useruploadsrouter.get('/userPosts',userAuthentication, async (req, res) => {
 	let userId = req['auth']?.userId
 	
 	let uploads = await UserUploads.find({"userId":userId})
+	.populate('userId', 'userName profilePicture')
+	.populate("comment.postedBy")
+	.populate("likedBy")
+	.populate("comment.replies.postedBy")
+	// 
+	console.log(uploads)
+	//    .populate('commentedBy')
+	//    .exec()
+	// let profileImage = await UserUploads.aggregate([
+	//     {$lookup:{
+	//     from:'userprofilepicture',
+	//     localField:'userId',
+	//     foreignField:'userId',
+	//     as:'anything'
+	// }}])
+	// console.log(profileImage)
+	//    .populate()
+	//    .populate('profilePicture','image')
+
+	// let userId = await UserProfilePicture.findById()
+	if (uploads) {
+		console.log(uploads)
+		res.json(uploads).status(200)
+	} else {
+		res.status(400).json('error')
+	}
+})
+
+useruploadsrouter.get('/otherUsersPosts/:id', async (req, res) => {
+	let {id} = req.params
+	
+	let uploads = await UserUploads.find({"userId":id})
 	.populate('userId', 'userName profilePicture')
 	.populate("comment.postedBy")
 	.populate("likedBy")
