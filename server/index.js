@@ -13,12 +13,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const app_1 = __importDefault(require("./app"));
-const http_1 = __importDefault(require("http"));
-const server = http_1.default.createServer(app_1.default);
+const http_1 = require("http");
 const config_1 = __importDefault(require("./utils/config"));
 const initMongodb_1 = __importDefault(require("./utils/initMongodb"));
 const socket_io_1 = require("socket.io");
 const logger_1 = __importDefault(require("./utils/logger"));
+const server = (0, http_1.createServer)(app_1.default);
 const io = new socket_io_1.Server(server, {
     cors: {
         origin: "*",
@@ -28,9 +28,6 @@ const io = new socket_io_1.Server(server, {
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         yield initMongodb_1.default.connect();
-        server.listen(config_1.default.PORT, () => {
-            logger_1.default.info(`Server running on port ${config_1.default.PORT}`);
-        });
     });
 }
 main();
@@ -82,4 +79,7 @@ io.on("connection", (socket) => {
         console.log("User Disconnected", socket.id);
         socket.broadcast.emit("callEnded");
     });
+});
+server.listen(config_1.default.PORT, () => {
+    logger_1.default.info(`Server running on port ${config_1.default.PORT}`);
 });

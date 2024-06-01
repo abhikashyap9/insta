@@ -1,10 +1,10 @@
 import app from './app'
-import http from 'http'
-const server = http.createServer(app);
+import { createServer } from "http";
 import config from "./utils/config";
 import initMongodb from "./utils/initMongodb";
 import { Server } from "socket.io";
 import logger from './utils/logger'
+const server = createServer(app);
 
 const io = new Server(server, {
   cors: {
@@ -16,9 +16,7 @@ const io = new Server(server, {
 async function main() {
   await initMongodb.connect();
 
-  server.listen(config.PORT, () => {
-    logger.info(`Server running on port ${config.PORT}`);
-  });
+
 }
 main();
 io.on("connection", (socket: any) => {
@@ -72,12 +70,14 @@ io.on("connection", (socket: any) => {
     socket.to(room).emit("join", "User joined the room");
   })
 
-
-  
   socket.on("disconnect", () => {
     console.log("User Disconnected", socket.id);
     socket.broadcast.emit("callEnded")
   });
 
   
+});
+
+server.listen(config.PORT, () => {
+  logger.info(`Server running on port ${config.PORT}`);
 });

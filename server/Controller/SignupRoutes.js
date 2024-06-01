@@ -25,7 +25,6 @@ const nodemailer_1 = __importDefault(require("nodemailer"));
 const config_1 = __importDefault(require("./config"));
 const Signup = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, fullName, userName, password } = req.body;
-    console.log(email);
     const saltRounds = 10;
     try {
         const userEmailExist = yield Signupschema_1.default.findOne({ email });
@@ -55,10 +54,10 @@ const Signup = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 const Login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password } = req.body;
     const user = yield Signupschema_1.default.findOne({ email });
+    const passwordCorrect = yield bcrypt_1.default.compare(password, user === null || user === void 0 ? void 0 : user.password);
     if (!(user && passwordCorrect)) {
         return res.status(401).json({ error: 'Invalid Password' });
     }
-    const passwordCorrect = yield bcrypt_1.default.compare(password, user === null || user === void 0 ? void 0 : user.password);
     const useForToken = {
         username: user.userName,
         id: user._id,

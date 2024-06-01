@@ -13,7 +13,7 @@ import config from './config'
 
 const Signup=async(req: Request, res: Response)=>{
     const {email, fullName, userName, password} = req.body
-	console.log(email)
+	
 	const saltRounds = 10
 	
 	try {
@@ -51,10 +51,11 @@ const Login=async(req: Request, res: Response)=>{
 
 	const user = await Signupuser.findOne({email})
 	
+	const passwordCorrect = await bcrypt.compare(password, user?.password!)
+	
 	if (!(user && passwordCorrect)) {
 		return res.status(401).json({error: 'Invalid Password'})
 	}
-	const passwordCorrect = await bcrypt.compare(password, user?.password!)
 	const useForToken = {
 		username: user.userName,
 		id: user._id,

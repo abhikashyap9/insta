@@ -124,9 +124,8 @@ const SignupForm = () => {
                     type="submit"
                     className="bg-sky-500 px-4 py-1 rounded-sm w-full"
                     disabled={isLoading}
-                    aria-label="Submit sign-up form"
                 >
-                    {isLoading ? <Loader /> : 'Signup'}
+                    Signup
                 </button>
             </div>
         </form>
@@ -134,3 +133,4 @@ const SignupForm = () => {
 }
 
 export default SignupForm
+                    {/* {isLoading ? <Loader /> : 'Signup'} */}

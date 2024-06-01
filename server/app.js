@@ -39,4 +39,7 @@ app.use('', Userprofile_1.default);
 app.use('', UserUploads_1.default);
 app.use('', Conversation_1.default);
 app.use('', VideoUploads_1.default);
+app.use('/', (req, res) => {
+    res.send('welcome');
+});
 exports.default = app;

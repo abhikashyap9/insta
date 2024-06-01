@@ -1,8 +1,6 @@
 import express, {Request, Response} from 'express'
 import cors from 'cors'
-
 import middleware from './utils/middleware'
-
 import fs from 'fs'
 import morgan from 'morgan'
 import path from 'path'
@@ -38,11 +36,13 @@ app.use(middleware.requestLogger)
 app.use(middleware.errorHandler)
 app.use(morgan('combined', { stream: accessLogStream }))
 // app.use(bodyParser.urlencoded({ extended: true }));
-
 app.use('/', signrouter)
 app.use('', profilerouter)
 app.use('', UserUploads)
 app.use('',conversationRouter)
 app.use('',videouploadrouter)
+app.use('/', (req, res) => {
+    res.send('welcome')
+  })
 
 export default app
