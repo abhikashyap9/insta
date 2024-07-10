@@ -26,13 +26,13 @@ const SignupForm = () => {
                 .required('Email is required')
                 .max(40, 'Max 40 Characters'),
             fullName: Yup.string()
-                .required(`Required`)
+                .required(`Fullname required`)
                 .max(15, 'Max 15 Characters'),
             userName: Yup.string()
-                .required(`Required`)
+                .required(`UserName required`)
                 .max(15, 'Max 15 Characters'),
             password: Yup.string()
-                .required(`Required`)
+                .required(`Password Required`)
                 .min(8, 'Min 8 Characters'),
         }),
         onSubmit: (values: CreateUser) => {
@@ -42,7 +42,7 @@ const SignupForm = () => {
 
     return (
         <form onSubmit={formik.handleSubmit} className="mt-4">
-            <div className={`relative`}>
+            <div className={`relative my-4`}>
                 <input
                     id="email"
                     name="email"
@@ -50,16 +50,16 @@ const SignupForm = () => {
                     onChange={formik.handleChange}
                     value={formik.values.email}
                     placeholder="Enter your Email"
-                    className="outline-none bg-transparent w-full text-sm font-normal"
+                    className="outline-none bg-transparent w-full text-sm font-normal p-1 border"
                 />
                 {formik.touched.email && formik.errors.email ? (
-                    <div className="text-red-400 text-xs absolute top-8">
+                    <div className="text-red-400 text-xs absolute top-7">
                         {formik.errors.email}
                     </div>
                 ) : null}
             </div>
 
-            <div className={`relative`}>
+            <div className={`relative my-4`}>
                 <input
                     id="fullName"
                     name="fullName"
@@ -67,15 +67,15 @@ const SignupForm = () => {
                     onChange={formik.handleChange}
                     value={formik.values.fullName}
                     placeholder="Enter your Full Name"
-                    className="outline-none bg-transparent w-full text-sm font-normal"
+                    className="outline-none bg-transparent w-full text-sm font-normal p-1 border"
                 />
                 {formik.touched.fullName && formik.errors.fullName ? (
-                    <div className="text-red-400 text-xs absolute top-8">
+                    <div className="text-red-400 text-xs absolute top-7">
                         {formik.errors.fullName}
                     </div>
                 ) : null}
             </div>
-            <div className={`relative`}>
+            <div className={`relative my-4`}>
                 <input
                     id="userName"
                     name="userName"
@@ -83,16 +83,16 @@ const SignupForm = () => {
                     onChange={formik.handleChange}
                     value={formik.values.userName}
                     placeholder="Enter Your User Name"
-                    className="outline-none bg-transparent w-full text-sm font-normal"
+                    className="outline-none bg-transparent w-full text-sm font-normal p-1 border"
                 />
                 {formik.touched.userName && formik.errors.userName ? (
-                    <div className="text-red-400 text-xs absolute top-8">
+                    <div className="text-red-400 text-xs absolute top-7">
                         {formik.errors.userName}
                     </div>
                 ) : null}
             </div>
 
-            <div className={`relative`}>
+            <div className={`relative my-4`}>
                 <input
                     id="password"
                     name="password"
@@ -100,10 +100,10 @@ const SignupForm = () => {
                     onChange={formik.handleChange}
                     value={formik.values.password}
                     placeholder="Password"
-                    className="outline-none bg-transparent w-full text-sm font-normal"
+                    className="outline-none bg-transparent w-full text-sm font-normal p-1 border"
                 />
                 {formik.touched.password && formik.errors.password ? (
-                    <div className="text-red-400 text-xs absolute top-8">
+                    <div className="text-red-400 text-xs absolute top-7">
                         {formik.errors.password}
                     </div>
                 ) : null}

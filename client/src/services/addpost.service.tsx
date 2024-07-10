@@ -1,5 +1,5 @@
 import axios from "axios";
-const baseUrl='https://instaserver-26it.onrender.com/'
+const baseUrl='https://insta-nx0g.onrender.com/'
 
 
 

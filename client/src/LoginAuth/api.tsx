@@ -18,12 +18,11 @@ export const useCreateUser = () => {
       },
       onSuccess: (data) => {
        console.log(data) 
-          // handleSuccess()
           navigate('/auth/login')
         },
         onError:(error)=>{
           console.log(error)
-          toast(error.response.data.message || error.response.data.error)
+          toast(error?.response?.data?.message || error?.response?.data?.error)
 
         }
     });

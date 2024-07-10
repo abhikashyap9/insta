@@ -1,6 +1,6 @@
 declare module Express {
-    export interface Request {
-        bucketUrl: string;
-        fileName: string;
-    }
+	export interface Request {
+		bucketUrl: string
+		fileName: string
+	}
 }
