@@ -36,12 +36,12 @@
 		"mongoose": "^6.6.5",
 		"mongoose-autopopulate": "^0.17.0",
 		"mongoose-unique-validator": "^3.1.0",
-		"morgan": "^1.10.0",
-		"multer": "^1.4.5-lts.1",
+		"morgan": "^1.10.1",
+		"multer": "^2.0.2",
 		"node-fetch": "^2.6.7",
 		"nodemailer": "^6.9.1",
 		"otp-generator": "^4.0.1",
-		"socket.io": "^4.5.4",
+		"socket.io": "^4.8.0",
 		"vitest": "^1.6.0"
 	},
 	"devDependencies": {
