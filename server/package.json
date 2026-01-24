@@ -22,7 +22,7 @@
 	"dependencies": {
 		"@ffmpeg-installer/ffmpeg": "^1.1.0",
 		"@types/mongoose": "^5.11.97",
-		"bcrypt": "^5.1.0",
+		"bcrypt": "^6.0.0",
 		"cloudinary": "^1.33.0",
 		"conditional-middleware": "^0.2.0",
 		"cors": "^2.8.5",
